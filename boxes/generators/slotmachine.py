@@ -24,8 +24,31 @@ class SlotMachine(Boxes):
         Boxes.__init__(self)
         self.addSettingsArgs(edges.FingerJointSettings)
         self.argparser.add_argument(
-            "--width",  action="store", type=float, default=355.0,
+            "--width",  action="store", type=float, default=365.0,
             help="inner width of the console")
+
+    def drawfront(self, move=None):
+        t = self.thickness
+        y, h = self.y, self.h
+        width = self.width
+        t = self.thickness
+        if self.move(y+35, h+155, move, True):
+            return
+        flexheight=15
+        self.moveTo(0, 0)
+        self.edges["f"](width)
+        self.corner(90)
+        self.edges["F"](self.front-flexheight)
+        #self.corner(90)
+        self.edges["X"](flexheight,width)
+        self.edges["F"](self.fronttop)
+        self.corner(90)
+        self.edges["f"](width)
+        self.corner(90)
+        self.edges["F"](self.fronttop)
+        self.edges["e"](flexheight)
+        self.edges["F"](self.front-flexheight)
+        self.move(y+10, h+30, move)
 
     def side(self, move=None):
         # TODO: Add callbacks
@@ -37,64 +60,45 @@ class SlotMachine(Boxes):
             return
 
         self.moveTo(10, 0)
-        self.edges["f"](y)
-        self.polyline(1, (90, 1))
-        self.edges["f"](h)
-        self.polyline(1, (90, 1))
-        self.edges["f"](self.topdepth)
-        self.polyline(1, (60, 1))
-        self.edges["f"](self.fronttop)
-        self.polyline(1, (30, 1))
-        self.edges["f"](self.front)
-        self.polyline(1, (90, 1))
-        #self.edges["f"](h)
-        #self.polyline(1, (90, 10))
+        self.edges["F"](y)
+        self.corner(90)
+        self.edges["F"](self.backwall)
+        self.corner(90)
+        self.edges["F"](self.topdepth)
+        self.corner(60)
+        self.edges["F"](self.fronttop)
+        self.corner(30)
+        self.edges["F"](self.front)
         self.move(y+10, h+30, move)
 
         return
-        self.moveTo(45, 0)
-        self.fingerHolesAt(10, 10, self.bottom, 0)
-        self.polyline(y-30, (90, 10))
-        self.fingerHolesAt(0.5*t, 10, self.back, 0)
-        self.fingerHolesAt(h-40-40, 10, self.back, 0)
-        
-        self.polyline(h-10, (45, 10))
-        self.fingerHolesAt(0, 10, self.topback, 0)
-        self.fingerHolesAt(200, 10+0.5*t, self.top, 90)
-        self.fingerHolesAt(200-0.5*t, 110, self.speaker, -180)
-        self.polyline(200, (90, 10), 100, (90, 10), 100, (-90, 10),  350, (-30, 10))
-        self.fingerHolesAt(0, 10, self.keyb, 0)
-        self.fingerHolesAt(-0.5*t, 10+0.5*t, self.keyback, 90)
-        self.fingerHolesAt(150+0.5*t, 10+0.5*t, self.front, 90)
-        self.polyline(150, (90, 10), 124.45, (75, 10), 5)
-
-        self.move(y+35, h+155, move)
         
     def render(self):
         y, h = self.y, self.h = 330, 457
         width = self.width
         t = self.thickness
 
-        self.bottom = y-0.5*t
+        #self.bottom = y-2*t
+        self.bottom = y-2*t
         self.backwall = h
-        self.front = 304
+        self.front = 305
         self.fronttop = 176
         self.topdepth = 241
 
         
-
         # Initialize canvas
         self.open()
+       
         # Floor AJS
-        self.rectangularWall(width, self.bottom, "efff", move="up")
+        self.rectangularWall(width, self.bottom, "fFfF", move="up")
         # Back
-        self.rectangularWall(width, self.backwall, move="up")
+        # f's: bottom, right,top,left 
+        self.rectangularWall(width, self.backwall-2*t, "FfFf", move="up")
+        #top 
+        self.rectangularWall(width, self.topdepth-2*t, "ffff", move="up")
 
-        # Front bottom
-        self.rectangularWall(width, self.front, "efff", move="up")
-        # Front Top
-        self.rectangularWall(width, self.fronttop, "efff", move="up")
-
+        self.drawfront(move="up")
+        
         # Sides
         self.side(move="up")
         self.side(move="up")
