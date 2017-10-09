@@ -22,83 +22,96 @@ class SlotMachine(Boxes):
     
     def __init__(self):
         Boxes.__init__(self)
-        self.addSettingsArgs(edges.FingerJointSettings)
-        self.argparser.add_argument(
-            "--width",  action="store", type=float, default=365.0,
-            help="inner width of the console")
 
-        self.y = 330
-        self.h = 457
-        self.width = 365.0
-        
-        self.bottom = self.y - 2*self.thickness
-        self.backwall = self.h
-        self.front = 305
-        self.fronttop = 176
-        self.topdepth = 241
+        self.addSettingsArgs(edges.FingerJointSettings)
+
 
     def drawfront(self, move=None):
-        t,y,h,width = (self.thickness, self.y, self.h, self.width)
+        t = self.thickness
 
-        if self.move(y+35, h+155, move, True):
-            return
+        if self.move(self.width+self.margin, self.front+self.margin, move, True): return
 
         flexheight=15
 
         self.moveTo(0, 0)
-        self.edges["f"](width)
+
+        self.edges["F"](self.width)
         self.corner(90)
-        self.edges["F"](self.front-flexheight)
+        self.edges["f"](self.front)
         #self.corner(90)
-        self.edges["X"](flexheight,width)
-        self.edges["F"](self.fronttop)
+        self.edges["X"](flexheight,self.width)
+        self.edges["f"](self.fronttop-flexheight)
         self.corner(90)
-        self.edges["f"](width)
+        self.edges["F"](self.width)
         self.corner(90)
-        self.edges["F"](self.fronttop)
+        self.edges["f"](self.fronttop-flexheight)
         self.edges["e"](flexheight)
-        self.edges["F"](self.front-flexheight)
-        self.move(y+10, h+30, move)
+        self.edges["f"](self.front)
+
+        self.move(self.width+self.margin, self.front+self.margin, move)
 
     def side(self, move=None):
-        t,y,h,width = (self.thickness, self.y, self.h, self.width)
+        if self.move(self.depth+self.margin, self.backwall+self.margin, move, True): return
 
-        if self.move(y+35, h+155, move, True):
-            return
+        self.moveTo(0, 0)
 
-        self.moveTo(10, 0)
-        self.edges["F"](y)
+        self.edges["F"](self.depth)
         self.corner(90)
         self.edges["F"](self.backwall)
         self.corner(90)
-        self.edges["F"](self.topdepth)
+        self.edges["f"](self.topdepth)
         self.corner(60)
         self.edges["F"](self.fronttop)
         self.corner(30)
         self.edges["F"](self.front)
-        self.move(y+10, h+30, move)
+
+        self.move(self.depth+self.margin, self.backwall+self.margin, move)
 
         return
         
     def render(self):
-        t,y,h,width = (self.thickness, self.y, self.h, self.width)
+        self.thickness = 3.1
+        self.burn = .25
+        self.reference = 0.0
+
+        self.width =  365.0
+        self.height = 457.0
+        self.depth =  330.0
+        self.margin = 5.0
+
+        self.backwall = self.height
+        self.topdepth = self.depth * .75
+        dx = (self.depth - self.topdepth)
+        self.fronttop = dx / math.cos(math.radians(60))
+        self.front = self.height - (dx / math.tan(math.radians(30)))
+
 
         # Initialize canvas
         self.open()
        
-        # Floor AJS
-        self.rectangularWall(width, self.bottom, "fFfF", move="up")
-        # Back
-        # f's: bottom, right,top,left 
-        self.rectangularWall(width, self.backwall-2*t, "FfFf", move="up")
-        #top 
-        self.rectangularWall(width, self.topdepth-2*t, "ffff", move="up")
+        t = self.thickness
 
-        self.drawfront(move="up")
-        
-        # Sides
-        self.side(move="up")
-        self.side(move="up")
+        self.ctx.set_font_size(30)
+
+        self.text("floor", self.width/2, self.depth/2, align="center")
+        #self.rectangularWall(self.width, self.depth - t*2, "fFfF", move="right")
+        self.rectangularWall(self.width, self.depth-t*2, "fFfF", move="right")
+
+        self.text("front", self.width/2, self.front/2, align="center")
+        self.drawfront(move="right")
+
+        self.text("top", self.width/2, self.topdepth/2, align="center")
+        self.rectangularWall(self.width, self.topdepth, "fFfF", move="right")
+
+        self.text("left side", self.depth/2, self.backwall/2, align="center")
+        self.side(move="right")
+
+        self.text("right side", self.depth/2, self.backwall/2, align="center")
+        self.side(move="right")
+
+        # f's: bottom, right,top,left 
+        self.text("back", self.width/2, self.backwall/2, align="center")
+        self.rectangularWall(self.width, self.backwall, "FfFf", move="right")
 
         self.close()
 

@@ -316,7 +316,7 @@ Values:
 
 * absolute_params
 
- * style : "wave : "wave" or "bumps"
+ * style : wave : "wave" or "bumps"
  * outset : True : extend outward the straight edge
 
 * relative (in multiples of thickness)
@@ -812,7 +812,7 @@ Values:
  * style : "outset" : "outset" or "flush"
  * outset : False : have lid overlap at the sides (similar to OutSetEdge)
  * pinwidth : 1.0 : set to lower value to get disks surrounding the pins
- * grip_percentage" : 0 : percentage of the lid that should get grips
+ * grip_percentage : 0 : percentage of the lid that should get grips
 
 * relative (in multiples of thickness)
 
@@ -1706,7 +1706,7 @@ Values:
 
  * distance : 0.5 : width of the pattern perpendicular to the cuts
  * connection : 1.0 : width of the gaps in the cuts
- * width" : 5.0 : width of the pattern in direction of the cuts
+ * width : 5.0 : width of the pattern in direction of the cuts
 
 """
     relative_params = {
