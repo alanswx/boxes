@@ -25,47 +25,87 @@ class SlotMachine(Boxes):
 
         self.addSettingsArgs(edges.FingerJointSettings)
 
+    def text(self, text, *args, **kwargs):
+      self.ctx.set_source_rgb(0,0,1)
+      Boxes.text(self, text, *args, **kwargs)
+      self.ctx.set_source_rgb(1,0,0)
 
     def drawfront(self, move=None):
         t = self.thickness
 
-        if self.move(self.width+self.margin, self.front+self.margin, move, True): return
+        if self.move(self.width+self.margin*2, self.front+self.margin, move, True): return
 
-        flexheight=15
+        self.moveTo(self.margin, 0)
+        self.ctx.save()
 
-        self.moveTo(0, 0)
+        # bottom
+        self.edges["F"](self.width-t*2)
 
-        self.edges["F"](self.width)
+        # right
         self.corner(90)
-        self.edges["f"](self.front)
-        #self.corner(90)
-        self.edges["X"](flexheight,self.width)
-        self.edges["f"](self.fronttop-flexheight)
-        self.corner(90)
-        self.edges["F"](self.width)
-        self.corner(90)
-        self.edges["f"](self.fronttop-flexheight)
-        self.edges["e"](flexheight)
-        self.edges["f"](self.front)
+        edges.FingerJointSettings.surroundingspaces = 0.0
+        self.edges["f"](self.front-self.flexheight/2)
+        self.edges["X"](self.flexheight,self.width-t*2)
+        self.edges["f"](self.fronttop-self.flexheight/2)
 
-        self.move(self.width+self.margin, self.front+self.margin, move)
+        # top
+        self.corner(90)
+        edges.FingerJointSettings.surroundingspaces = 1.0
+        self.edges["F"](self.width-t*2)
+
+        # left
+        self.corner(90)
+        self.edges["f"](self.fronttop-self.flexheight/2)
+        self.edges["e"](self.flexheight)
+        self.edges["f"](self.front-self.flexheight/2)
+
+        
+        ## screen
+        screen_width = 229.5
+        screen_height = 150
+
+        self.ctx.restore()
+        self.ctx.save()
+        cx = self.width/2
+        cy = self.front + self.fronttop/2
+        self.moveTo(cx - screen_width/2, cy - screen_height/2)
+        self.rectangularWall(screen_width, screen_height, "eeee")
+
+        ## tray
+        self.ctx.restore()
+        tray_width = 100
+        tray_height = 50
+
+        cx = self.width/2
+        cy = self.front + self.fronttop/2
+        self.moveTo(cx - tray_width/2, 20)
+        self.rectangularWall(tray_width, tray_height, "eeee")
+
+        self.move(self.width+self.margin*2, self.front+self.margin, move)
 
     def side(self, move=None):
-        if self.move(self.depth+self.margin, self.backwall+self.margin, move, True): return
+        if self.move(self.depth+self.margin*2, self.height+self.margin, move, True): return
 
-        self.moveTo(0, 0)
+        self.moveTo(self.margin, 0)
 
+        # bottom
         self.edges["F"](self.depth)
+
+        # right
         self.corner(90)
-        self.edges["F"](self.backwall)
+        self.edges["F"](self.height)
+
+        # top
         self.corner(90)
         self.edges["f"](self.topdepth)
+
+        # right
         self.corner(60)
         self.edges["F"](self.fronttop)
         self.corner(30)
         self.edges["F"](self.front)
 
-        self.move(self.depth+self.margin, self.backwall+self.margin, move)
+        self.move(self.depth+self.margin*2, self.height+self.margin, move)
 
         return
         
@@ -74,44 +114,61 @@ class SlotMachine(Boxes):
         self.burn = .25
         self.reference = 0.0
 
+        ## exterior dimensions
         self.width =  365.0
-        self.height = 457.0
+        #self.height = 457.0
+        self.height = 480.0
         self.depth =  330.0
-        self.margin = 5.0
+        self.margin = 10.0
+        self.flexheight=20
 
-        self.backwall = self.height
-        self.topdepth = self.depth * .75
+        self.topdepth = self.depth * .70
         dx = (self.depth - self.topdepth)
         self.fronttop = dx / math.cos(math.radians(60))
         self.front = self.height - (dx / math.tan(math.radians(30)))
 
 
+        for key in ("width", "height", "depth", "topdepth", "flexheight",
+                    "fronttop", "front", "burn", "thickness", "margin"):
+          print ("%10s: %6.2f mm" % (key, getattr(self, key)))
+
+        edges.FingerJointSettings.surroundingspaces = 1.0
+
         # Initialize canvas
         self.open()
+        self.ctx.set_source_rgb(1,0,0)
        
         t = self.thickness
 
         self.ctx.set_font_size(30)
 
         self.text("floor", self.width/2, self.depth/2, align="center")
-        #self.rectangularWall(self.width, self.depth - t*2, "fFfF", move="right")
-        self.rectangularWall(self.width, self.depth-t*2, "fFfF", move="right")
+        self.rectangularWall(self.width, self.depth, "fFfF", move="right", exterior=True)
 
         self.text("front", self.width/2, self.front/2, align="center")
         self.drawfront(move="right")
 
         self.text("top", self.width/2, self.topdepth/2, align="center")
-        self.rectangularWall(self.width, self.topdepth, "fFfF", move="right")
+        self.rectangularWall(self.width, self.topdepth, "fFfF", exterior=True)
+        cx = self.width/2
+        cy = self.topdepth/2
+        self.circle(cx - 50, cy, 30)
+        self.circle(cx + 50, cy, 30)
+        self.moveTo(self.width, 0)
 
-        self.text("left side", self.depth/2, self.backwall/2, align="center")
+        self.text("left side", self.depth/2, self.height/2, align="center")
         self.side(move="right")
 
-        self.text("right side", self.depth/2, self.backwall/2, align="center")
-        self.side(move="right")
+        self.text("right side", self.depth/2, self.height/2, align="center")
+        self.side(move=None)
+        cx = self.depth/2
+        cy = self.height/2
+        self.circle(cx, cy-self.height/4, 20)
+        self.moveTo(self.depth, 0)
 
         # f's: bottom, right,top,left 
-        self.text("back", self.width/2, self.backwall/2, align="center")
-        self.rectangularWall(self.width, self.backwall, "FfFf", move="right")
+        self.text("back", self.width/2, self.height/2, align="center")
+        self.rectangularWall(self.width, self.height, "FfFf", move="right", exterior=True)
 
         self.close()
 

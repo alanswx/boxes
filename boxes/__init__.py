@@ -1399,7 +1399,8 @@ class Boxes:
                         holesMargin=None, holesSettings=None,
                         bedBolts=None, bedBoltSettings=None,
                         callback=None,
-                        move=None):
+                        move=None,
+                        exterior=False):
         """
         Rectangular wall for all kind of box like objects
 
@@ -1413,14 +1414,21 @@ class Boxes:
         :param bedBoltSettings:  (Default value = None)
         :param callback:  (Default value = None)
         :param move:  (Default value = None)
+        :param exterior: are the width/height measurements for the exterior (Default value = False)
 
         """
         if len(edges) != 4:
             raise ValueError("four edges required")
         edges = [self.edges.get(e, e) for e in edges]
         edges += edges  # append for wrapping around
-        overallwidth = x + edges[-1].spacing() + edges[1].spacing()
-        overallheight = y + edges[0].spacing() + edges[2].spacing()
+        if exterior:
+          overallwidth = x
+          overallheight = y
+          x -= + edges[-1].spacing() + edges[1].spacing()
+          y -= + edges[0].spacing() + edges[2].spacing()
+        else:
+          overallwidth = x + edges[-1].spacing() + edges[1].spacing()
+          overallheight = y + edges[0].spacing() + edges[2].spacing()
 
         if self.move(overallwidth, overallheight, move, before=True):
             return
@@ -1438,7 +1446,7 @@ class Boxes:
             if 2*i in ignore_widths:
                 l += edges[i+1].startwidth()
                 e2 = self.edges["e"]
-            if 2*i+1in ignore_widths:
+            if 2*i+1 in ignore_widths:
                 e1 = self.edges["e"]
 
             edges[i](l,
