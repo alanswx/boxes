@@ -27,14 +27,24 @@ class SlotMachine(Boxes):
             "--width",  action="store", type=float, default=365.0,
             help="inner width of the console")
 
+        self.y = 330
+        self.h = 457
+        self.width = 365.0
+        
+        self.bottom = self.y - 2*self.thickness
+        self.backwall = self.h
+        self.front = 305
+        self.fronttop = 176
+        self.topdepth = 241
+
     def drawfront(self, move=None):
-        t = self.thickness
-        y, h = self.y, self.h
-        width = self.width
-        t = self.thickness
+        t,y,h,width = (self.thickness, self.y, self.h, self.width)
+
         if self.move(y+35, h+155, move, True):
             return
+
         flexheight=15
+
         self.moveTo(0, 0)
         self.edges["f"](width)
         self.corner(90)
@@ -51,10 +61,7 @@ class SlotMachine(Boxes):
         self.move(y+10, h+30, move)
 
     def side(self, move=None):
-        # TODO: Add callbacks
-
-        y, h = self.y, self.h
-        t = self.thickness
+        t,y,h,width = (self.thickness, self.y, self.h, self.width)
 
         if self.move(y+35, h+155, move, True):
             return
@@ -74,18 +81,8 @@ class SlotMachine(Boxes):
         return
         
     def render(self):
-        y, h = self.y, self.h = 330, 457
-        width = self.width
-        t = self.thickness
+        t,y,h,width = (self.thickness, self.y, self.h, self.width)
 
-        #self.bottom = y-2*t
-        self.bottom = y-2*t
-        self.backwall = h
-        self.front = 305
-        self.fronttop = 176
-        self.topdepth = 241
-
-        
         # Initialize canvas
         self.open()
        
