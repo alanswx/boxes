@@ -100,10 +100,14 @@ class SlotMachine(Boxes):
         self.edges["f"](self.topdepth)
 
         # right
+        edges.FingerJointSettings.surroundingspaces = 0.0
         self.corner(60)
-        self.edges["F"](self.fronttop)
+        self.edges["F"](self.fronttop-self.flexheight/2)
+        self.edges["e"](self.flexheight/2)
         self.corner(30)
-        self.edges["F"](self.front)
+        self.edges["e"](self.flexheight/2)
+        self.edges["F"](self.front-self.flexheight/2)
+        edges.FingerJointSettings.surroundingspaces = 1.0
 
         self.move(self.depth+self.margin*2, self.height+self.margin, move)
 
@@ -167,8 +171,35 @@ class SlotMachine(Boxes):
         self.moveTo(self.depth, 0)
 
         # f's: bottom, right,top,left 
+        self.ctx.save()
         self.text("back", self.width/2, self.height/2, align="center")
-        self.rectangularWall(self.width, self.height, "FfFf", move="right", exterior=True)
+        self.rectangularWall(self.width, self.height, "FfFf", move=None, exterior=True)
+        self.ctx.restore()
+        
+        ## draw hatch
+        hatch_width = self.width * .80
+        hatch_height = self.height * .80
+
+        cx = self.width/2
+        cy = self.height/2
+        self.moveTo(cx - hatch_width/2, cy-hatch_height/2)
+        self.roundedPlate(hatch_width, hatch_height, 20, edge="e")
+        
+        ## draw hatch backing
+        self.moveTo(self.width+self.margin, 0)
+
+        cx = (hatch_width+20)/2
+        cy = (hatch_height+20)/2
+
+        self.text("hatch backing", cx, cy, align="center")
+
+        self.ctx.save()
+        self.moveTo(cx - (hatch_width+20)/2, cy-(hatch_height+20)/2)
+        self.roundedPlate(hatch_width+20, hatch_height+20, 20, edge="e")
+
+        self.ctx.restore()
+        self.moveTo(cx - (hatch_width-40)/2, cy-(hatch_height-40)/2)
+        self.roundedPlate(hatch_width-40, hatch_height-40, 20, edge="e")
 
         self.close()
 

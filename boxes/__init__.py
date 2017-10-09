@@ -655,7 +655,7 @@ class Boxes:
 
     def regularPolygon(self, corners=3, radius=None, h=None, side=None):
         """Give messures of a regular polygone
-        :param corners: number of corners of the polygone
+        :param corners: number of corners of the polygon
         :param radius: distance center to one of the corners
         :param h: distance center to one of the sides (height of sector)
         :param side: length of one side
