@@ -689,9 +689,11 @@ class FingerHoleEdge(BaseEdge):
         self.fingerHoles(0, dist + self.settings.thickness / 2, length, 0,
                          bedBolts=bedBolts, bedBoltSettings=bedBoltSettings)
         self.ctx.restore()
-        # XXX continue path
-        self.ctx.move_to(0, 0)
-        self.ctx.line_to(length, 0)
+
+        if not "no_continue" in kw:
+          # XXX continue path
+          self.ctx.move_to(0, 0)
+          self.ctx.line_to(length, 0)
         self.ctx.translate(*self.ctx.get_current_point())
 
     def startwidth(self):
