@@ -44,14 +44,14 @@ def dist(dx, dy):
     Return distance
 
     :param dx: delta x
-    :param dy: delat y
+    :param dy: delta y
     """
     return (dx * dx + dy * dy) ** 0.5
 
 
 def restore(func):
     """
-    Wrapper: Restore coordiantes after function
+    Wrapper: Restore coordinates after function
 
     :param func: function to wrap
 
@@ -207,7 +207,7 @@ boolarg = BoolArg()
 ##############################################################################
 
 class Boxes:
-    """Main class -- Generator should sub class this """
+    """Main class -- Generator should sub class this"""
 
     webinterface = True
     ui_group = "Misc"
@@ -239,7 +239,7 @@ class Boxes:
             help="print reference rectangle with given length")
         defaultgroup.add_argument(
             "--burn", action="store", type=float, default=0.1,
-            help="burn correction in mm (bigger values for tighter fit)")
+            help="burn correction in mm (larger values for tighter fit)")
 
     def open(self):
         """
@@ -798,7 +798,7 @@ class Boxes:
 
         :param x: width in mm
         :param h: height in mm
-        :param hl: height if th grip hole
+        :param hl: height of the grip hole
         :param r:  (Default value = 30) radius of the corners
 
         """
