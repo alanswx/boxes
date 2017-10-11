@@ -25,6 +25,21 @@ class PSFile:
             f.write(media + " " * (len(m.group(1)) - len(media)))
 
 
+class ContextWrapper:
+  def __init__(self, ctx):
+    self._ctx = ctx
+
+  def __getattr__(self, x):
+    if x.startswith("_"): return getattr(self, x)
+    return getattr(self._ctx, x)
+
+  def __enter__(self):
+    self._ctx.save()
+
+  def __exit__(self, exc_type, exc_value, traceback):
+    self._ctx.restore()
+
+
 class Formats:
     pstoedit = "/usr/bin/pstoedit"
 
@@ -70,7 +85,7 @@ class Formats:
             height *= mm2pt  # 3.543307
             surface = cairo.PSSurface(filename, width, height)
 
-        ctx = cairo.Context(surface)
+        ctx = ContextWrapper(cairo.Context(surface))
         ctx.translate(0, height)
         ctx.scale(mm2pt, -mm2pt)
 

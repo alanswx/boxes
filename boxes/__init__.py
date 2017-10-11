@@ -852,6 +852,9 @@ class Boxes:
         self.ctx.translate(*self.ctx.get_current_point())
         self.ctx.rotate(angle)
 
+    def movectx(self, x, y, where):
+      return MoveCTX(self, x, y, where)
+
     def move(self, x, y, where, before=False):
         """Intended to be used by parts
         where can be combinations of "up", "down", "left", "right" and "only"
@@ -1584,3 +1587,22 @@ class Boxes:
             kw["move"] = "right only"
             for i in range(width):
                 part(*l, **kw)
+
+class NoMovement(Exception):
+  pass
+
+class MoveCTX:
+  def __init__(self, box, x, y, where):
+    self.box = box
+    self.x = x
+    self.y = y
+    self.where = where
+    self.ret = None
+
+  def __enter__(self):
+    self.ret = not self.box.move(self.x,self.y,self.where,True)
+    return self.ret
+    
+  def __exit__(self, exc_type, exc_value, traceback):
+    if not self.ret: return
+    self.box.move(self.x,self.y,self.where,False)
