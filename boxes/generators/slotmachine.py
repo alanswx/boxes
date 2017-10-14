@@ -61,7 +61,7 @@ class SlotMachine(Boxes):
             ## screen
 
             with self.ctx:
-              cx = self.width/2
+              cx = self.width/2-self.thickness
               cy = self.front + self.fronttop/2
               self.moveTo(cx - self.screen_width/2, cy - self.screen_height/2)
               self.draw_rect(self.screen_width, self.screen_height)
@@ -599,7 +599,7 @@ class SlotMachine(Boxes):
           w = self.width-self.thickness*2
           h = self.topdepth - self.thickness*2
           self.draw_rect(w, h)
-          self.moveTo(w/2-self.screen_inner_width/2 + self.thickness, 
+          self.moveTo(w/2-self.screen_inner_width/2 , 
                       h/2-self.screen_inner_height/2)
           self.draw_rect(self.screen_inner_width, self.screen_inner_height)
 
