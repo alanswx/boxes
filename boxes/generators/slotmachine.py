@@ -147,7 +147,21 @@ class SlotMachine(Boxes):
     def draw_chute_side(self, move=None):
       with self.movectx(self.depth+self.margin*2, self.tray_elevation, move) as m:
         if m:
-          self.rectangularWall(self.chute_side_width, self.tray_elevation-self.thickness, "feee", move=None)      
+          #self.rectangularWall(self.chute_side_width, self.tray_elevation-self.thickness, "feee", move=None)      
+          # we need to notch out a spot for the servo - so no simple rectangle
+          sides="feee"
+          self.edges[sides[0]](self.chute_side_width)
+          self.corner(90)
+          self.edges[sides[1]](self.tray_elevation-self.thickness)
+          self.corner(90)
+          self.edges[sides[2]](self.chute_side_width-100)
+          self.corner(90)
+          self.edges[sides[2]](40)
+          self.corner(-90)
+          self.edges[sides[2]](100)
+          self.corner(90)
+          self.edges[sides[3]](self.tray_elevation-self.thickness-40)
+          self.corner(90)
           ## coin tray floor holes
           with self.ctx:
             self.moveTo(self.thickness*0, 20)
@@ -171,6 +185,31 @@ class SlotMachine(Boxes):
           self.edges['e'](self.cointray_width)
           self.corner(90)
           self.edges['f'](self.cointray_depth-self.thickness)
+          self.edges['e'](self.cointray_height)
+          self.corner(90, 20)
+          
+          #self.rectangularWall(self.chute_width, self.cointray_depth-self.thickness, "efef", move=None)      
+
+    def draw_cointray_buildup(self,move=None):
+      with self.movectx(self.chute_width+self.margin*2, self.cointray_depth, move) as m:
+        if m:
+          # bottom edge (minus 40 for round 20 sides)
+          self.edges['e'](self.cointray_width-40)
+          self.corner(90, 20)
+          # side
+          self.edges['e'](self.cointray_height)
+          self.corner(90)          
+          # back small part
+          self.edges['e'](20)
+          self.corner(90)          
+          self.edges['e'](self.cointray_height-20)
+          self.corner(-90,20)          
+          self.edges['e'](self.cointray_width-80)
+          self.corner(-90,20)          
+          self.edges['e'](self.cointray_height-20)
+          self.corner(90)          
+          self.edges['e'](20)
+          self.corner(90)
           self.edges['e'](self.cointray_height)
           self.corner(90, 20)
           
@@ -425,11 +464,16 @@ class SlotMachine(Boxes):
           self.draw_chute(move="up")
 
           self.moveTo(0, self.margin*2)
+          with self.ctx:
+            self.label("chute tray", self.chute_width/2, self.cointray_depth/2, align="center")
+            self.draw_cointray(move="right")
 
-          self.label("chute tray", self.chute_width/2, self.cointray_depth/2, align="center")
-          self.draw_cointray(move="up")
+            num_buildup = math.ceil(20 / self.thickness)
+            for i in range(num_buildup):
+                self.label("chute tray buildup", self.chute_width/2, self.cointray_depth/2, align="center")
+                self.draw_cointray_buildup(move="right")
 
-          self.moveTo(0, self.margin*1)
+          self.moveTo(0, self.margin*1+self.cointray_depth)
           self.draw_chute_side(move="up")
 
           self.moveTo(0, self.margin*1)
