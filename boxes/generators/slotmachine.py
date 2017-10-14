@@ -209,6 +209,59 @@ class SlotMachine(Boxes):
           
           #self.rectangularWall(self.chute_width, self.cointray_depth-self.thickness, "efef", move=None)      
 
+    def draw_tray_plastic(self, move=None):
+      with self.movectx(self.tray_width+self.margin*2, self.tray_depth, move) as m:
+        if m:
+          with self.ctx:
+            self.moveTo(0, 0)
+            self.edges["e"](self.tray_width)
+            self.corner(90)
+            self.edges["f"](self.tray_depth)
+            self.corner(90)
+            dx = (self.tray_width - self.hatch_width)/2
+            self.edges["f"](dx)
+            self.edges["e"](self.hatch_width)
+            self.edges["f"](dx)
+            self.corner(90)
+            self.edges["f"](self.tray_depth)
+
+          cx = self.tray_width / 2
+
+          with self.ctx:
+            self.moveTo(75,10)
+            self.draw_rect(self.tray_width-150,100)
+
+          with self.ctx:
+            self.moveTo(cx-self.raceway_width-self.raceway_width/2, 0)
+          #  self.draw_servo(-10,25)
+          #  self.hole(-12.5, 25+115, 4.7/2)
+          #  self.hole(-12.5, 25+115+68, 4.7/2)
+          #  self.hole(-12.5+68, 25+115+68, 4.7/2)
+          #  self.hole(-12.5+68, 25+115, 4.7/2)
+            self.moveTo(0, 40+20)
+
+          #  # we don't need the raceway with plastic
+          #  #self.draw_rect(self.raceway_width, self.raceway_height)
+
+          #  # hole for coin to fall through
+            self.moveTo(-10, self.raceway_height)
+            self.draw_rect(self.raceway_width+20, 70)
+
+          with self.ctx:
+            self.moveTo(cx+self.raceway_width/2, 0)
+
+          #  self.draw_servo(-10,25)
+          #  self.hole(-12.5, 25+115, 4.7/2)
+          #  self.hole(-12.5, 25+115+68, 4.7/2)
+          #  self.hole(-12.5+68, 25+115+68, 4.7/2)
+          #  self.hole(-12.5+68, 25+115, 4.7/2)
+            self.moveTo(0, 40+20)
+
+
+            # hole for coin to fall through
+            self.moveTo(-10, self.raceway_height)
+            self.draw_rect(self.raceway_width+20, 70)
+
     def draw_tray(self, move=None):
       with self.movectx(self.tray_width+self.margin*2, self.tray_depth, move) as m:
         if m:
@@ -389,6 +442,7 @@ class SlotMachine(Boxes):
         self.hatch_height = self.height * .80
 
         self.tray_depth = self.depth - 30 - self.thickness*2
+        self.tray_depth_plastic = self.tray_depth -85 
         self.tray_width = self.width - self.thickness*2
         self.tray_elevation = self.height/2-20
 
@@ -487,7 +541,7 @@ class SlotMachine(Boxes):
 
         with self.ctx:
           self.label("tray", self.tray_width/2, self.tray_depth/2, align="center")
-          self.draw_tray(move="up")
+          self.draw_tray_plastic(move="up")
 
           self.moveTo(0, self.margin*2)
 
