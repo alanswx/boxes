@@ -168,7 +168,7 @@ class SlotMachine(Boxes):
             self.continueDirection(self.chute_angle_radians)
             self.edges["h"](self.chute_length, no_continue=True)
 
-    def draw_cointray(self, move=None):
+    def draw_cointray_old(self, move=None):
       with self.movectx(self.chute_width+self.margin*2, self.cointray_depth, move) as m:
         if m:
           self.edges['e'](self.cointray_width-40)
@@ -184,21 +184,44 @@ class SlotMachine(Boxes):
           
           #self.rectangularWall(self.chute_width, self.cointray_depth-self.thickness, "efef", move=None)      
 
+    def draw_cointray(self, move=None):
+      with self.movectx(self.chute_width+40+self.margin*2, self.cointray_depth, move) as m:
+        if m:
+          self.edges['e'](self.cointray_width)
+          self.corner(90, 20)
+          self.edges['e'](self.cointray_height)
+          self.corner(90)
+          self.edges['e'](20)
+          self.corner(-90)
+          self.edges['e'](self.cointray_depth-self.thickness)
+          self.corner(90)          
+          self.edges['e'](self.cointray_width)
+          self.corner(90)
+          self.edges['e'](self.cointray_depth-self.thickness)
+          self.corner(-90)
+          self.edges['e'](20)
+          self.corner(90)
+          self.edges['e'](self.cointray_height)
+          self.corner(90, 20)
+          
+          #self.rectangularWall(self.chute_width, self.cointray_depth-self.thickness, "efef", move=None)      
+
     def draw_cointray_buildup(self,move=None):
-      with self.movectx(self.chute_width+self.margin*2, self.cointray_depth, move) as m:
+      with self.movectx(self.chute_width+40+self.margin*2, self.cointray_depth, move) as m:
         if m:
           # bottom edge (minus 40 for round 20 sides)
-          self.edges['e'](self.cointray_width-40)
+          self.edges['e'](self.cointray_width)
           self.corner(90, 20)
           # side
           self.edges['e'](self.cointray_height)
+          #self.edges['e'](self.cointray_depth-self.thickness)
           self.corner(90)          
           # back small part
           self.edges['e'](20)
           self.corner(90)          
           self.edges['e'](self.cointray_height-20)
           self.corner(-90,20)          
-          self.edges['e'](self.cointray_width-80)
+          self.edges['e'](self.cointray_width-40)
           self.corner(-90,20)          
           self.edges['e'](self.cointray_height-20)
           self.corner(90)          
