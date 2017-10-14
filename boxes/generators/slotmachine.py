@@ -144,29 +144,14 @@ class SlotMachine(Boxes):
           #self.rectangularWall(self.chute_side_width, self.tray_elevation-self.thickness, "feee", move=None)      
           # we need to notch out a spot for the servo - so no simple rectangle
           sides="feee"
-          self.edges[sides[0]](self.chute_side_width)
-          self.corner(90)
-          self.edges[sides[1]](self.tray_elevation-self.thickness)
-          self.corner(90)
-          self.edges[sides[2]](self.chute_side_width-100)
-          self.corner(90)
-          self.edges[sides[2]](40)
-          self.corner(-90)
+          self.edges['e'](100)
+          self.corner(math.degrees(self.chute_angle_radians))
+          self.edges['F'](self.chute_length)
+          self.corner(180-math.degrees(self.chute_angle_radians))
           self.edges[sides[2]](100)
-          self.corner(90)
-          self.edges[sides[3]](self.tray_elevation-self.thickness-40)
-          self.corner(90)
-          ## coin tray floor holes
-          with self.ctx:
-            self.moveTo(self.thickness*0, 20)
-            self.continueDirection(math.radians(0))
-            self.edges["h"](self.cointray_depth, no_continue=True)
-
-          ## chute holes
-          with self.ctx:
-            self.moveTo((self.thickness*0+60), 20)
-            self.continueDirection(self.chute_angle_radians)
-            self.edges["h"](self.chute_length, no_continue=True)
+          self.corner(math.degrees(self.chute_angle_radians))
+          self.edges[sides[2]](self.chute_length)
+          self.corner(90-math.degrees(self.chute_angle_radians))
 
     def draw_cointray_old(self, move=None):
       with self.movectx(self.chute_width+self.margin*2, self.cointray_depth, move) as m:
@@ -471,7 +456,8 @@ class SlotMachine(Boxes):
 
         self.chute_side_width = self.depth*.85
 
-        self.chute_elevation = 20+self.thickness*1
+        #self.chute_elevation = 20+self.thickness*1
+        self.chute_elevation = self.thickness*1
         self.chute_width = self.cointray_width+self.thickness*1
         dy = self.tray_elevation-self.chute_elevation
         dx = self.depth - self.cointray_depth - self.thickness*2
