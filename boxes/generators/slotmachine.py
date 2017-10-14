@@ -242,9 +242,9 @@ class SlotMachine(Boxes):
             self.edges["f"](self.tray_depth)
             self.corner(90)
             dx = (self.tray_width - self.hatch_width)/2
-            self.edges["f"](dx)
+            self.edges["e"](dx)
             self.edges["e"](self.hatch_width)
-            self.edges["f"](dx)
+            self.edges["e"](dx)
             self.corner(90)
             self.edges["f"](self.tray_depth)
 
@@ -464,8 +464,8 @@ class SlotMachine(Boxes):
         self.hatch_width = self.width * .80
         self.hatch_height = self.height * .80
 
-        self.tray_depth = self.depth - 30 - self.thickness*2
-        self.tray_depth_plastic = self.tray_depth -85 
+        
+        self.tray_depth = self.depth - 30 - self.thickness*2 - self.thickness*2 
         self.tray_width = self.width - self.thickness*2
         self.tray_elevation = self.height/2-20
 
