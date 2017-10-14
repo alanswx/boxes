@@ -46,47 +46,42 @@ class SlotMachine(Boxes):
               self.corner(90)
               self.edges["f"](self.front-self.flexheight/2)
               self.edges["X"](self.flexheight,self.width-t*2)
-              self.edges["f"](self.fronttop-self.flexheight)
-              self.edges["X"](self.flexheight,self.width-t*2)
               self.edges["f"](self.topdepth-self.flexheight/2)
 
               # top
               self.corner(90)
-              self.edges["f"](self.width-t*2)
+              self.edges["e"](self.width-t*2)
 
               # left
               self.corner(90)
               self.edges["f"](self.topdepth-self.flexheight/2)
               self.edges["e"](self.flexheight)
-              self.edges["f"](self.fronttop-self.flexheight)
-              self.edges["e"](self.flexheight)
               self.edges["f"](self.front-self.flexheight/2)
 
-            with self.ctx:
-              cx = self.width/2
-              cy = self.topdepth/2 + self.front + self.fronttop
-
-              ## dispenser tube holes
-              dx = 238.2 - 165.5
-              self.circle(cx - dx/2, cy, 43.5/2)
-              self.circle(cx + dx/2, cy, 43.5/2)
-
             ## screen
-            screen_width = 218
-            screen_height = 137
 
             with self.ctx:
               cx = self.width/2
-              cy = self.front + self.fronttop/2
-              self.moveTo(cx - screen_width/2, cy - screen_height/2)
-              self.rectangularWall(screen_width, screen_height, "eeee")
+              cy = self.front + self.fronttop/2 + self.flexheight
+              self.moveTo(cx - self.screen_width/2, cy - self.screen_height/2)
+              self.draw_rect(self.screen_width, self.screen_height)
 
             ## tray
             with self.ctx:
               cx = self.width/2
               cy = self.front + self.fronttop/2
               self.moveTo(cx - self.cointray_width/2, 20)
-              self.roundedPlate(self.cointray_width, self.cointray_height, 20, edge="e")
+              
+              self.edges['e'](self.cointray_width)
+              self.corner(90)
+              self.edges['e'](self.cointray_height)
+              self.corner(90, 20)
+              self.edges['e'](self.cointray_width-40)
+              self.corner(90, 20)
+              self.edges['e'](self.cointray_height)
+              self.corner(90)
+              
+              #self.roundedPlate(self.cointray_width, self.cointray_height, 20, edge="e")
               #self.rectangularWall(self.cointray_width, self.cointray_height, "eeee")
 
     def draw_side(self, which="left", move=None):
@@ -136,12 +131,12 @@ class SlotMachine(Boxes):
       self.moveTo(x,y)
       w = 20
       h = 40
-      self.roundedPlate(w, h, 0, edge="e")
+      self.draw_rect(w, h)
 
-      self.hole(w/2+6, -5 + self.burn*2, 2)
-      self.hole(w/2-6, -5 + self.burn*2, 2)
-      self.hole(w/2+6, h+5 + self.burn*2, 2)
-      self.hole(w/2-6, h+5 + self.burn*2, 2)
+      self.hole(w/2+5, -5, 2.5/2)
+      self.hole(w/2-5, -5, 2.5/2)
+      self.hole(w/2+5, h+5, 2.5/2)
+      self.hole(w/2-5, h+5, 2.5/2)
 
 
     def draw_chute(self, move=None):
@@ -152,7 +147,7 @@ class SlotMachine(Boxes):
     def draw_chute_side(self, move=None):
       with self.movectx(self.depth+self.margin*2, self.tray_elevation, move) as m:
         if m:
-          self.rectangularWall(self.chute_side_width, self.tray_elevation-self.thickness, "fefe", move=None)      
+          self.rectangularWall(self.chute_side_width, self.tray_elevation-self.thickness, "feee", move=None)      
           ## coin tray floor holes
           with self.ctx:
             self.moveTo(self.thickness*0, 20)
@@ -168,13 +163,24 @@ class SlotMachine(Boxes):
     def draw_cointray(self, move=None):
       with self.movectx(self.chute_width+self.margin*2, self.cointray_depth, move) as m:
         if m:
-          self.rectangularWall(self.chute_width, self.cointray_depth-self.thickness, "efef", move=None)      
+          self.edges['e'](self.cointray_width-40)
+          self.corner(90, 20)
+          self.edges['e'](self.cointray_height)
+          self.edges['f'](self.cointray_depth-self.thickness)
+          self.corner(90)          
+          self.edges['e'](self.cointray_width)
+          self.corner(90)
+          self.edges['f'](self.cointray_depth-self.thickness)
+          self.edges['e'](self.cointray_height)
+          self.corner(90, 20)
+          
+          #self.rectangularWall(self.chute_width, self.cointray_depth-self.thickness, "efef", move=None)      
 
     def draw_tray(self, move=None):
       with self.movectx(self.tray_width+self.margin*2, self.tray_depth, move) as m:
         if m:
           with self.ctx:
-            self.moveTo(self.margin, 0)
+            self.moveTo(0, 0)
             self.edges["e"](self.tray_width)
             self.corner(90)
             self.edges["f"](self.tray_depth)
@@ -186,29 +192,30 @@ class SlotMachine(Boxes):
             self.corner(90)
             self.edges["f"](self.tray_depth)
 
-            cx = self.tray_width / 2
-            cy = self.tray_depth / 2
-
-          raceway_width = 40
-          raceway_height = 134
+          cx = self.tray_width / 2
+          cy = self.tray_depth / 2
 
           with self.ctx:
-            self.moveTo(cx-raceway_width, 20)
+            self.moveTo(cx-self.raceway_width-self.raceway_width/2, 0)
 
-            self.draw_servo(raceway_width+5, 0)
-            self.moveTo(0, 40+10)
-            self.roundedPlate(raceway_width, raceway_height, 0, edge="e")
-            self.moveTo(0-self.burn*2, raceway_height)
-            self.roundedPlate(42, 42, 0, edge="e")
+            self.draw_servo(self.raceway_width+5, 10)
+            self.moveTo(0, 40+20)
+
+            self.draw_rect(self.raceway_width, self.raceway_height)
+
+            self.moveTo(-10, self.raceway_height)
+            self.draw_rect(self.raceway_width+20, 70)
 
           with self.ctx:
-            self.moveTo(cx+raceway_width, 20)
+            self.moveTo(cx+self.raceway_width/2, 0)
 
-            self.draw_servo(raceway_width+5, 0)
-            self.moveTo(0, 40+10)
-            self.roundedPlate(raceway_width, raceway_height, 0, edge="e")
-            self.moveTo(0-self.burn*2, raceway_height)
-            self.roundedPlate(42, 42, 0, edge="e")
+            self.draw_servo(self.raceway_width+5, 10)
+            self.moveTo(0, 40+20)
+
+            self.draw_rect(self.raceway_width, self.raceway_height)
+
+            self.moveTo(-10, self.raceway_height)
+            self.draw_rect(self.raceway_width+20, 70)
 
 
     def hatch_backing(self, move=None):
@@ -219,30 +226,30 @@ class SlotMachine(Boxes):
 
           with self.ctx:
             self.moveTo(cx - (self.hatch_width+20)/2, cy-(self.hatch_height+20)/2)
-            self.roundedPlate(self.hatch_width+20, self.hatch_height+20, 20, edge="e")
+            self.draw_rect(self.hatch_width+20, self.hatch_height+20)
 
           with self.ctx:
             self.moveTo(cx - (self.hatch_width-40)/2, cy-(self.hatch_height-40)/2)
             self.roundedPlate(self.hatch_width-40, self.hatch_height-40, 20, edge="e")
 
     @restore
+    def draw_cross(self, cx, cy, width):
+      for angle in (0,90,180,270):
+        with self.ctx:
+          self.moveTo(cx, cy)
+          self.continueDirection(math.radians(angle))
+          self.edges['e'](width)
+      
+
+    @restore
     def draw_rect(self, width, height, sides='eeee'):
       self.edges[sides[0]](width)
       self.corner(90)
-      d = 26
-      edges.FingerJointSettings.surroundingspaces = 0
-      if sides[1] != 'e': self.edges['e'](self.thickness+self.burn*d)
-      self.edges[sides[1]](height-2*(self.thickness + self.burn*d))
-      if sides[1] != 'e': self.edges['e'](self.thickness+self.burn*d)
-      edges.FingerJointSettings.surroundingspaces = 2
+      self.edges[sides[1]](height)
       self.corner(90)
       self.edges[sides[2]](width)
       self.corner(90)
-      edges.FingerJointSettings.surroundingspaces = 0
-      if sides[3] != 'e': self.edges['e'](self.thickness+self.burn*d)
-      self.edges[sides[3]](height-2*(self.thickness + self.burn*d))
-      if sides[3] != 'e': self.edges['e'](self.thickness+self.burn*d)
-      edges.FingerJointSettings.surroundingspaces = 2
+      self.edges[sides[3]](height)
       self.corner(90)
 
     def draw_floor(self, move=None):
@@ -252,13 +259,13 @@ class SlotMachine(Boxes):
 
           ## chute holes
           with self.ctx:
-            self.moveTo((self.width/2 - self.chute_width/2), (self.thickness*1+self.burn*4))
+            self.moveTo((self.width/2 - self.chute_width/2)+self.thickness, (self.thickness*1+self.burn*4))
             self.continueDirection(math.radians(90))
             self.edges["h"](self.chute_side_width, no_continue=True)
 
           ## chute holes
           with self.ctx:
-            self.moveTo((self.width/2 + self.chute_width/2), (self.thickness*1+self.burn*4))
+            self.moveTo((self.width/2 + self.chute_width/2)+self.thickness*2, (self.thickness*1+self.burn*4))
             self.continueDirection(math.radians(90))
             self.edges["h"](self.chute_side_width, no_continue=True)
           
@@ -287,10 +294,16 @@ class SlotMachine(Boxes):
           self.moveTo(self.hatch_width+dx-self.thickness*1, 0)
           self.edges["h"](dx, no_continue=True)
         
+    def label(self, text, x=0, y=0, angle=0, align=""):
+      if not self.show_labels: return
+      self.text(text, x,y,angle=angle, align=align)
+
     def render(self):
         self.thickness = 3.1
-        self.burn = .40
+        self.burn = .25
         self.reference = 0.0
+
+        self.show_labels = False
 
         ## exterior dimensions
         self.width =  365.0
@@ -300,7 +313,7 @@ class SlotMachine(Boxes):
         self.margin = 10.0
         self.flexheight=20
 
-        self.cointray_width = 100
+        self.cointray_width = 150
         self.cointray_height = 50
         self.cointray_depth = 60
 
@@ -318,11 +331,21 @@ class SlotMachine(Boxes):
         self.tray_elevation = self.height/2-20
 
         self.chute_elevation = 20
-        self.chute_width = self.cointray_width + 20
+        self.chute_width = self.cointray_width+self.thickness*1
         dy = self.tray_elevation-self.chute_elevation
         self.chute_length = math.sin(math.radians(45)) * dy*2
 
         self.chute_side_width = self.depth*.85
+
+        self.raceway_width = 40
+        self.raceway_height = 134
+
+        self.dispenser_width = 43.5
+
+        self.screen_width = 218
+        self.screen_height = 137
+        self.screen_inner_width = 230
+        self.screen_inner_height = 151
 
         for key in ("width", "height", "depth", "topdepth", "flexheight",
                     "fronttop", "front", "burn", "thickness", "margin"):
@@ -341,69 +364,69 @@ class SlotMachine(Boxes):
         with self.ctx:
           self.moveTo(0, self.depth+self.margin+self.thickness)
 
-          self.text("left side", self.depth/2, self.height/2, align="center")
+          self.label("left side", self.depth/2, self.height/2, align="center")
           self.draw_side("right", move=None)
 
         self.moveTo(self.depth+self.margin, 0)
 
         with self.ctx:
-          self.text("floor", self.width/2, self.depth/2, align="center")
+          self.label("floor", self.width/2, self.depth/2, align="center")
           self.draw_floor(move="up")
 
           self.moveTo(self.thickness, self.margin)
 
-          self.text("front", self.width/2, self.front/2, align="center")
+          self.label("front", self.width/2, self.front/2, align="center")
           self.draw_front(move="up")
 
-        self.moveTo(self.width, 0)
+          self.moveTo(0, self.front+self.margin)
 
-        if 0:
-          self.text("top", self.width/2, self.topdepth/2, align="center")
-          self.rectangularWall(self.width, self.topdepth, "fFfF", exterior=True)
+          self.label("top", self.width/2, self.topdepth/2, align="center")
+          self.rectangularWall(self.width, self.topdepth, "eFfF", exterior=True)
           cx = self.width/2
           cy = self.topdepth/2
 
           ## dispenser tube holes
-          dx = 238.2 - 165.5
-          self.circle(cx - dx/2, cy, 43.5/2)
-          self.circle(cx + dx/2, cy, 43.5/2)
-          self.moveTo(self.width, 0)
+          thy = self.topdepth - (self.tray_depth - (15+40+10+self.raceway_height)) - self.dispenser_width/2
+          self.hole(cx - self.raceway_width + self.thickness/2, thy, self.dispenser_width/2)
+          self.hole(cx + self.raceway_width + self.thickness/2, thy, self.dispenser_width/2)
+
+        self.moveTo(self.width, 0)
 
         with self.ctx:
           self.moveTo(self.margin, self.depth+self.margin)
-          self.text("right side", self.depth/2, self.height/2, align="center")
+          self.label("right side", self.depth/2, self.height/2, align="center")
           self.draw_side(move=None)
 
           cx = self.depth/2
           cy = self.height/2
-          self.circle(cx+50, 60, 54/2)
+          self.hole(cx+50, 60, 54/2)
 
         self.moveTo(self.depth+self.margin*2, 0)
 
         with self.ctx:
           # back
           self.moveTo(0, self.depth+self.margin-self.thickness)
-          self.text("back", self.width/2, self.height/2, align="center")
+          self.label("back", self.width/2, self.height/2, align="center")
           self.draw_back(move="up")
 
           ## draw hatch backing
-          self.text("hatch backing", self.hatch_width/2, self.hatch_height/2, align="center")
+          self.label("hatch backing", self.hatch_width/2, self.hatch_height/2, align="center")
           self.hatch_backing(move="right")
 
         self.moveTo(self.width+self.margin*2, 0)
 
         with self.ctx:
-          self.text("tray", self.tray_width/2, self.tray_depth/2, align="center")
+          self.label("tray", self.tray_width/2, self.tray_depth/2, align="center")
           self.draw_tray(move="up")
 
           self.moveTo(0, self.margin*2)
 
-          self.text("chute", self.chute_width/2, self.chute_length/2, align="center")
+          self.label("chute", self.chute_width/2, self.chute_length/2, align="center")
           self.draw_chute(move="up")
 
           self.moveTo(0, self.margin*2)
 
-          self.text("chute tray", self.chute_width/2, self.cointray_depth/2, align="center")
+          self.label("chute tray", self.chute_width/2, self.cointray_depth/2, align="center")
           self.draw_cointray(move="up")
 
           self.moveTo(0, self.margin*1)
@@ -411,6 +434,16 @@ class SlotMachine(Boxes):
 
           self.moveTo(0, self.margin*1)
           self.draw_chute_side(move="up")
+
+        self.moveTo(self.tray_width+self.margin*2, 0)
+
+        with self.ctx:
+          w = self.width-self.thickness*2
+          h = self.topdepth - self.thickness*2
+          self.draw_rect(w, h)
+          self.moveTo(w/2-self.screen_inner_width/2 + self.thickness, 
+                      h/2-self.screen_inner_height/2)
+          self.draw_rect(self.screen_inner_width, self.screen_inner_height)
 
         self.close()
 
