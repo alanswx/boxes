@@ -546,7 +546,7 @@ class SlotMachine(Boxes):
 
           cx = self.depth/2
           cy = self.height/2
-          self.hole(cx, 60, 54/2)
+          self.hole(cx, 190, 54/2)
 
         self.moveTo(self.depth+self.margin*2, 0)
 
