@@ -99,17 +99,15 @@ class SlotMachine(Boxes):
 
             # right
             self.corner(90)
-            self.edges["F"](self.height - self.thickness*1)
+            self.edges["F"](self.height - self.thickness*2)
 
             # top
             self.corner(90)
-            self.edges["f"](self.topdepth - self.flexheight/2)
-            self.edges["e"](self.flexheight/2)
+            self.edges["f"](self.topdepth)
 
             # left
             self.corner(60)
-            self.edges["e"](self.flexheight/2)
-            self.edges["F"](self.fronttop-self.flexheight)
+            self.edges["F"](self.fronttop-self.flexheight/2)
             self.edges["e"](self.flexheight/2)
             self.corner(30)
             self.edges["e"](self.flexheight/2)
@@ -340,7 +338,7 @@ class SlotMachine(Boxes):
           self.moveTo(self.margin, 0)
 
           with self.ctx:
-            self.rectangularWall(self.width-self.thickness*2, self.height-self.thickness, "FfFf", move=None)
+            self.rectangularWall(self.width-self.thickness*2, self.height-self.thickness*2, "FfFf", move=None)
             #self.draw_rect(self.width-self.thickness*2, self.height-self.thickness*0, "FfFf")
 
             ## draw hatch
