@@ -437,7 +437,8 @@ class SlotMachine(Boxes):
       self.text(text, x,y,angle=angle, align=align)
 
     def render(self):
-        self.thickness = 2.8
+        edges.FingerJointSettings.play = 0.5
+        #self.thickness = 2.8
         self.thickness = 5.0
         self.burn = .30
         self.reference = 0.0
