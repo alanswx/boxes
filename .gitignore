@@ -1,3 +1,6 @@
+.autosave*
+*egg-info*
+.backup*
 *~
 *.plt
 *.svg
