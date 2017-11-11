@@ -15,21 +15,28 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from boxes import *
-from boxes import servos
+from __future__ import print_function
+import argparse
+import os
+import sys
+from pprint import pprint
 
-class SlotMachine(Boxes):
+from boxes import *
+import boxes
+
+
+class SlotMachine(boxes.Boxes):
     """Desktop SlotMachine"""
     
     def __init__(self):
-        Boxes.__init__(self)
+        boxes.Boxes.__init__(self)
 
         self.addSettingsArgs(edges.FingerJointSettings)
 
     def text(self, text, *args, **kwargs):
-      self.ctx.set_source_rgb(0,0,1)
+      self.ctx.set_source_rgb(*boxes.BLUE)
       Boxes.text(self, text, *args, **kwargs)
-      self.ctx.set_source_rgb(1,0,0)
+      self.ctx.set_source_rgb(*boxes.defaultStrokeColor)
 
     def draw_front(self, move=None):
         t = self.thickness
@@ -196,7 +203,7 @@ class SlotMachine(Boxes):
           #self.rectangularWall(self.chute_width, self.cointray_depth-self.thickness, "efef", move=None)      
 
     def draw_cointray_buildup(self,move=None):
-      with self.movectx(self.chute_width+40+self.margin*2, self.cointray_depth, move) as m:
+      with self.movectx(self.chute_width+40+self.margin*2, self.cointray_depth+20, move) as m:
         if m:
           # bottom edge (minus 40 for round 20 sides)
           self.edges['e'](self.cointray_width)
@@ -430,6 +437,7 @@ class SlotMachine(Boxes):
         self.reference = 0.0
 
         self.show_labels = False
+        self.show_labels = True
 
         ## exterior dimensions
         self.width =  365.0
@@ -488,8 +496,11 @@ class SlotMachine(Boxes):
         #edges.FingerJointSettings.surroundingspaces = 1.0
 
         # Initialize canvas
+        boxes.defaultStrokeColor = boxes.RED
+        boxes.holeStrokeColor = boxes.RED
         self.open()
-        self.ctx.set_source_rgb(1,0,0)
+
+        #self.ctx.set_source_rgb(1,0,0)
        
         t = self.thickness
 
@@ -514,7 +525,7 @@ class SlotMachine(Boxes):
 
           self.moveTo(0, self.front+self.margin)
 
-          self.label("top", self.width/2, self.topdepth/2, align="center")
+          self.label("top", self.width/2, self.topdepth/4, align="center")
           self.draw_rect(self.width, 
 												 self.topdepth-self.thickness*2-self.burn, 
 												 "eFfF")
@@ -565,10 +576,12 @@ class SlotMachine(Boxes):
             self.label("chute tray", self.chute_width/2, self.cointray_depth/2, align="center")
             self.draw_cointray(move="right")
 
+            self.moveTo(self.chute_width/2, 0)
+
             num_buildup = math.ceil(20 / self.thickness)
             for i in range(num_buildup):
                 self.label("chute tray buildup", self.chute_width/2, self.cointray_depth/2, align="center")
-                self.draw_cointray_buildup(move="right")
+                self.draw_cointray_buildup(move="up")
 
           if 0:
             self.moveTo(0, self.margin*1+self.pusher_depth)
@@ -578,17 +591,23 @@ class SlotMachine(Boxes):
             self.draw_pusher_tab(move="up")
 
           self.moveTo(0, self.margin*2+self.cointray_depth*2)
+          self.label("chute side", self.depth/2, 
+                     self.tray_elevation/2, align="center")
           self.draw_chute_side(move="up")
 
-          self.moveTo(0, self.margin*1)
+          self.moveTo(0, self.margin*1 - self.tray_elevation/2)
+          self.label("chute side", self.depth/2, 
+                     self.tray_elevation/2, align="center")
           self.draw_chute_side(move="up")
 
         self.moveTo(self.tray_width+self.margin*2, 0)
 
         ## screen holder
         with self.ctx:
+
           w = self.width-self.thickness*2
           h = self.topdepth+self.flexheight - self.thickness*1 - self.burn*2
+          self.label("inner screen holder", w/2, h/2, align="center")
           self.draw_rect(w, h)
           with self.ctx:
             self.hole(   20,   20, 3/2)
@@ -606,6 +625,7 @@ class SlotMachine(Boxes):
         with self.ctx:
           w = self.width-self.thickness*2
           h = self.topdepth+self.flexheight - self.thickness*1 - self.burn*2
+          self.label("inner screen backer", w/2, h/2, align="center")
           self.draw_rect(w, h)
           with self.ctx:
             self.hole(   20,   20, 4/2)
@@ -620,3 +640,12 @@ class SlotMachine(Boxes):
 
         self.close()
 
+def main(argv, stdout, environ):
+  if sys.version_info < (3, 0): reload(sys); sys.setdefaultencoding('utf8')
+
+  box = SlotMachine()
+  box.parseArgs(argv[1:])
+  box.render()
+
+if __name__ == "__main__":
+  main(sys.argv, sys.stdout, os.environ)

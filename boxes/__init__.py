@@ -67,6 +67,13 @@ def restore(func):
 
     return f
 
+BLUE =  (0., 0., 1.)
+GREEN = (0., 1., 0.)
+RED =   (1., 0., 0.)
+BLACK = (0., 0., 0.)
+
+defaultStrokeColor = BLACK
+holeStrokeColor = BLUE
 
 def holeCol(func):
     """
@@ -79,10 +86,10 @@ def holeCol(func):
     @wraps(func)
     def f(self, *args, **kw):
         self.ctx.stroke()
-        self.ctx.set_source_rgb(0.0, 0.0, 1.0)
+        self.ctx.set_source_rgb(*holeStrokeColor)
         func(self, *args, **kw)
         self.ctx.stroke()
-        self.ctx.set_source_rgb(0.0, 0.0, 0.0)
+        self.ctx.set_source_rgb(*defaultStrokeColor)
 
     return f
 
@@ -247,11 +254,15 @@ class Boxes:
 
         Call this function from your .render() method
         """
+
+        
         self.spacing = 2 * self.burn + 0.5 * self.thickness
 
         self.bedBoltSettings = (3, 5.5, 2, 20, 15)  # d, d_nut, h_nut, l, l1
         self.hexHolesSettings = (5, 3, 'circle')  # r, dist, style
         self.surface, self.ctx = self.formats.getSurface(self.format, self.output)
+        self.ctx.set_source_rgb(*defaultStrokeColor)
+
         self.ctx.set_line_width(2 * self.burn)
         self.ctx.select_font_face("sans-serif")
         self._buildObjects()
