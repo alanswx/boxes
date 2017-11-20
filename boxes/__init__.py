@@ -39,6 +39,12 @@ from boxes import parts
 
 ### Helpers
 
+def inch2mm(m):
+  if type(m) == type(()):
+    return (n*25.4 for n in m)
+  else:
+    return m * 25.4
+
 def dist(dx, dy):
     """
     Return distance
