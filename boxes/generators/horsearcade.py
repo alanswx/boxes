@@ -150,6 +150,11 @@ class HorseArcade(Boxes):
             h = self.adjustSize(h)
 
         t = self.thickness
+
+        s = edges.FingerJointSettings(self.thickness/2, relative=False,space = 10, finger=10,width=self.thickness/2)
+        self.addPart(edges.FingerHoles(self, s), name="fingerHolesHalfAt")
+
+
         self.x=x
         self.y=y
         self.h=h
