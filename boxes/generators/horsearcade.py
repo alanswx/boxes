@@ -131,6 +131,7 @@ class HorseArcade(Boxes):
         #self.show_labels = False
         self.show_labels = True
         self.thickness = 5.0
+        self.plasticThickness = 2.30
         self.burn = .30
         self.reference = 0.0
 
@@ -151,9 +152,10 @@ class HorseArcade(Boxes):
 
         t = self.thickness
 
-        s = edges.FingerJointSettings(self.thickness/2, relative=False,space = 10, finger=10,width=self.thickness/2)
-        self.addPart(edges.FingerHoles(self, s), name="fingerHolesHalfAt")
-
+        s = edges.FingerJointSettings(self.plasticThickness, relative=False, 
+                                      space=10, finger=10,
+                                      width=self.plasticThickness)
+        self.addPart(edges.FingerHoles(self, s), name="fingerHolesPlastic")
 
         self.x=x
         self.y=y
