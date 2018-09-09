@@ -50,12 +50,14 @@ class HorseArcade(Boxes):
                                    self.tower_height-self.corner_dy-self.h, 90)  ## right
 
                 #self.fingerHolesAt(0, self.h-self.thickness/2, self.corner_dx+self.tower_depth, 0)
-                self.fingerHolesAt(0, self.h-self.thickness/2, self.y, 0)
-                self.fingerHolesAt(0, self.corner_dy+self.h-self.thickness/2, self.tower_depth, 0)
+                self.fingerHolesAt(0, self.h+self.thickness-self.thickness/2+self.burn*2, self.y, 0)
+                #self.fingerHolesAt(0, self.corner_dy+self.h-self.thickness/2, self.tower_depth, 0)
+                self.fingerHolesAt(0, self.corner_dy+self.h-self.thickness/2, self.candyDepth + self.thickness*2, 0)
 
                 self.edges['e'](self.y)
                 self.corner(90)
-                self.edges['f'](self.h + self.thickness + self.burn*2)
+                self.edges['f'](self.h)
+                self.edges['e'](self.thickness)
                 self.corner(90)
                 self.edges['e'](self.y - self.corner_dx - self.tower_depth)
                 self.corner(-math.degrees(self.corner_angle_radians))
@@ -66,7 +68,8 @@ class HorseArcade(Boxes):
                 self.edges['e'](self.tower_depth)
                 self.corner(90)
                 self.edges['e'](self.tower_height-self.h)
-                self.edges['f'](self.h + self.thickness + self.burn*2)
+                self.edges['e'](self.thickness)
+                self.edges['f'](self.h)
 
             #self.move(self.y+self.thickness, self.tower_height, move)
             self.move(self.corner_dx + self.tower_depth + self.thickness, self.h+self.thickness, move)
@@ -115,6 +118,7 @@ class HorseArcade(Boxes):
                 self.corner(90)
                 self.edges['e'](self.bracketDepth)
                 self.edges['f'](self.candyDepth)
+
                 self.hole(self.candyWidth/2+self.bracketWidth, self.bracketDepth+self.candyDepth/2, 2.5/2)
                 self.hole(-(self.bracketDepth+self.candyDepth-15), self.candyWidth+self.bracketWidth/2, 5)
                 self.hole(-(self.bracketDepth+self.candyDepth-15-47), self.candyWidth+self.bracketWidth/2, 5)
@@ -154,7 +158,7 @@ class HorseArcade(Boxes):
         self.corner_length = math.sqrt(self.corner_dx*self.corner_dx+self.corner_dy*self.corner_dy)
         self.corner_angle_radians = math.atan(self.corner_dy/self.corner_dx)
 
-        self.candyWidth=52
+        self.candyWidth=55
         self.candyDepth=91
         self.candyHeight=12
         self.bracketWidth=22
@@ -196,11 +200,13 @@ class HorseArcade(Boxes):
 
         self.moveTo(0, h + self.thickness*2)
 
+        ## top
         with self.ctx:
           #self.rectangularHole(130/2+25,150/2+y/2,130,150)
-          self.hole(self.x-100-150, y/4, 24/2)
-          self.hole(self.x-100, y/4, 24/2)
-          self.fingerHolesAt(self.candyWidth,self.tower_depth, self.corner_dx+self.tower_depth, 90)
+          self.hole(self.x-100-150, y/4, 24/2)  ## button 1
+          self.hole(self.x-100, y/4, 24/2)      ## button 2
+          self.fingerHolesAt(self.candyWidth + self.thickness*2, self.tower_depth - self.thickness*2, 
+                             self.corner_dx+self.tower_depth, 90)
 
           self.rectangularWall(x, y, "ffff", bedBolts=[d2, d3, d2, d3], move=None)
 
