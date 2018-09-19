@@ -246,9 +246,9 @@ class HorseArcade2(Boxes):
         self.rectangularWall(self.candyWidth+self.thickness*3,
                            self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight,
                            "IEJe")
-        self.moveTo(self.candyWidth + self.thickness*4, 0)
+        self.moveTo(self.candyWidth + self.thickness*8, 0)
 
-      if 1:
+      if 0:
         self.label("Dispenser", self.candyWidth/2, 25, align="center")
         self.label("tube top", self.candyWidth/2, 15, align="center")
         self.rectangularWall(self.candyWidth,
@@ -272,15 +272,16 @@ class HorseArcade2(Boxes):
           self.edges['e'](self.thickness*3)
           self.corner(90)
           self.edges['e'](self.thickness*2)
-        self.moveTo(self.candyWidth + self.thickness*4, 0)
+        self.moveTo(self.candyWidth + self.thickness*4+10, 0)
 
       ## bottom hinge bracket
-      self.label("Door", self.candyWidth/2, 25, align="center")
-      self.label("bottom bracket", self.candyWidth/2, 15, align="center")
-      self.rectangularWall(self.thickness*2,
+      if 0:
+        self.label("Door", self.candyWidth/2, 25, align="center")
+        self.label("bottom bracket", self.candyWidth/2, 15, align="center")
+        self.rectangularWall(self.thickness*2,
                                          self.towerDepth,
                                          "ifee")
-      self.moveTo(self.candyWidth + self.thickness*4, 0)
+        self.moveTo(self.candyWidth + self.thickness*4, 0)
 
       self.label("Door", self.candyWidth/2, 25, align="center")
       self.label("bottom bracket", self.candyWidth/2, 15, align="center")
@@ -384,9 +385,9 @@ class HorseArcade2(Boxes):
          # hole for the ethernet jack
          jackoffset=-10
          self.rectangularHole(self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
-         self.rectangularHole(self.piWidth/4+jackoffset, self.piHeight/2, 25, 26)
+         #self.rectangularHole(self.piWidth/4+jackoffset, self.piHeight/2, 25, 26)
          self.rectangularHole(2*self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
-         self.rectangularHole(2*self.piWidth/4+jackoffset, self.piHeight/2, 25, 26)
+         #self.rectangularHole(2*self.piWidth/4+jackoffset, self.piHeight/2, 25, 26)
          self.rectangularHole(3*self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
          self.rectangularHole(4*self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
          self.moveTo(0, self.piHeight + self.thickness*2)
