@@ -121,7 +121,8 @@ class HorseArcade2(Boxes):
 
       self.open()
 
-      self.ajoiningBoltDiameter = 5
+      #self.ajoiningBoltDiameter = 5
+      self.ajoiningBoltDiameter=6.75
 
       self.candyWidth=58
       self.candyDepth=96
@@ -243,8 +244,8 @@ class HorseArcade2(Boxes):
       if 1:
         self.label("Dispenser", self.candyWidth/2, 25, align="center")
         self.label("back door", self.candyWidth/2, 15, align="center")
-        self.rectangularWall(self.candyWidth+self.thickness*3,
-                           self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight,
+        self.rectangularWall(self.candyWidth+self.thickness*5,
+                           self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight-self.thickness,
                            "IEJe")
         self.moveTo(self.candyWidth + self.thickness*8, 0)
 
@@ -260,7 +261,7 @@ class HorseArcade2(Boxes):
         self.label("Dispenser", self.candyWidth/2, 25, align="center")
         self.label("tube top2", self.candyWidth/2, 15, align="center")
         with self.ctx:
-          self.edges['i'](self.candyWidth+self.thickness*2+self.thickness*2)
+          self.edges['i'](self.candyWidth+self.thickness*2+self.thickness*2+self.thickness*2)
           self.corner(90)
           self.edges['e'](self.thickness)
           self.edges['F'](self.towerDepth-self.thickness)
@@ -269,10 +270,10 @@ class HorseArcade2(Boxes):
           self.corner(90)
           self.edges['F'](self.towerDepth-self.thickness)
           self.corner(-90)
-          self.edges['e'](self.thickness*3)
+          self.edges['e'](self.thickness*5)
           self.corner(90)
           self.edges['e'](self.thickness*2)
-        self.moveTo(self.candyWidth + self.thickness*4+10, 0)
+        self.moveTo(self.candyWidth + self.thickness*6+10, 0)
 
       ## bottom hinge bracket
       if 0:
@@ -286,6 +287,7 @@ class HorseArcade2(Boxes):
       self.label("Door", self.candyWidth/2, 25, align="center")
       self.label("bottom bracket", self.candyWidth/2, 15, align="center")
       with self.ctx:
+          #self.edges['i'](self.thickness*2+self.thickness*2)
           self.edges['i'](self.thickness*2+self.thickness*2)
           self.corner(90)
           self.edges['e'](self.thickness)
@@ -323,13 +325,27 @@ class HorseArcade2(Boxes):
           self.moveTo(self.thickness, self.thickness)
           # button 1
           self.hole(self.consoleWidth/4, self.consoleDepth/2, self.buttonHoleDiameter/2)
+          # holes for small buttons
+          # distance: 6.2
+          # hole diameter: 3.75
+          self.tinybuttonhole=5.5
+          self.tinyholedistance=6.1
+          self.hole(self.consoleWidth/4-self.buttonHoleDiameter/2-self.tinyholedistance, self.consoleDepth/2, self.tinybuttonhole/2)
+          self.hole(self.consoleWidth/4+self.buttonHoleDiameter/2+self.tinyholedistance, self.consoleDepth/2, self.tinybuttonhole/2)
+
           # button 2
           self.hole(3*(self.consoleWidth/4), self.consoleDepth/2, self.buttonHoleDiameter/2)
+          # holes for small buttons
+          # distance: 6.2
+          # hole diameter: 3.75
+          self.hole(3*self.consoleWidth/4-self.buttonHoleDiameter/2-self.tinyholedistance, self.consoleDepth/2, self.tinybuttonhole/2)
+          self.hole(3*self.consoleWidth/4+self.buttonHoleDiameter/2+self.tinyholedistance, self.consoleDepth/2, self.tinybuttonhole/2)
 
           t = boxes.holeStrokeColor
           boxes.holeStrokeColor = self.etchStrokeColor
           self.hole(self.consoleWidth/4, self.consoleDepth/2, self.buttonDiameter/2)
           self.hole(3*(self.consoleWidth/4), self.consoleDepth/2, self.buttonDiameter/2)
+
 
           boxes.holeStrokeColor = t
         self.moveTo(0, self.consoleDepth + self.thickness*4)
