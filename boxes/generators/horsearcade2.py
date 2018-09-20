@@ -30,24 +30,31 @@ class HorseArcade2(Boxes):
           self.fingerHolesPlastic(self.thickness*1,
                            self.candyHeight+self.corner_dy+self.dispenserHeight + self.thickness,
                            self.towerHeight-self.corner_dy-self.dispenserHeight - self.candyHeight, 90)  #left
+
         self.fingerHolesPlastic(self.thickness*1 + self.candyDepth,
                            self.candyHeight+self.corner_dy+self.dispenserHeight + self.thickness,
                            self.towerHeight-self.corner_dy-self.dispenserHeight - self.candyHeight, 90)  ## right
 
         self.fingerHolesAt(0, self.dispenserHeight+self.thickness-self.thickness/2+self.burn*2,
                            self.dispenserDepth, 0)
-        self.fingerHolesAt(0, self.corner_dy+self.dispenserHeight-self.thickness/2,
-                           self.candyDepth + self.thickness*2, 0)
+        if 0:
+          self.fingerHolesAt(0, self.corner_dy+self.dispenserHeight-self.thickness/2,
+                             self.candyDepth + self.thickness*2, 0)
 
         self.edges['e'](self.dispenserDepth)
         self.corner(90)
         self.edges['f'](self.dispenserHeight)
         self.edges['e'](self.thickness)
         self.corner(90)
-        self.edges['e'](self.dispenserDepth - self.corner_dx - self.towerDepth)
-        self.corner(-math.degrees(self.corner_angle_radians))
-        self.edges['e'](self.corner_length)
-        self.corner(-math.degrees(self.corner_angle_radians))
+        if 0:
+          self.edges['e'](self.dispenserDepth - self.corner_dx - self.towerDepth)
+          self.corner(-math.degrees(self.corner_angle_radians))
+          self.edges['e'](self.corner_length)
+          self.corner(-math.degrees(self.corner_angle_radians))
+        else:
+          self.edges['e'](self.dispenserDepth - self.corner_dx - self.towerDepth)
+          self.corner(-90)
+
         self.edges['e'](self.towerHeight-self.corner_dy-self.dispenserHeight)
         self.corner(90)
         self.edges['f'](self.towerDepth)
@@ -84,10 +91,10 @@ class HorseArcade2(Boxes):
 
     def pusherTray(self):
       with self.ctx:
-        self.edges['e'](self.candyWidth)
+        self.edges['f'](self.candyWidth)
         self.corner(90)
-        self.edges['f'](self.candyDepth)
-        self.edges['e'](self.thickness*1)
+        self.edges['f'](self.dispenserDepth)
+        #self.edges['e'](self.thickness*1)
         self.corner(-90)
         self.edges['e'](self.bracketWidth)
         self.corner(90)
@@ -96,12 +103,12 @@ class HorseArcade2(Boxes):
         self.edges['e'](self.bracketWidth+self.candyWidth)
         self.corner(90)
         self.edges['f'](self.bracketDepth)
-        self.edges['e'](self.thickness*1)
-        self.edges['f'](self.candyDepth)
+        #self.edges['e'](self.thickness*1)
+        self.edges['f'](self.dispenserDepth)
 
-        self.hole(self.candyWidth/2+self.bracketWidth, self.bracketDepth+self.candyDepth/2, 2.5/2)
-        self.hole(-(self.bracketDepth+self.candyDepth-15), self.candyWidth+self.bracketWidth/2, 5)
-        self.hole(-(self.bracketDepth+self.candyDepth-15-47), self.candyWidth+self.bracketWidth/2, 5)
+        #self.hole(self.candyWidth/2+self.bracketWidth, self.bracketDepth+self.candyDepth/2, 2.5/2)
+        self.hole(-(self.dispenserDepth+self.bracketDepth-15), self.candyWidth+self.bracketWidth/2, 5)
+        self.hole(-(self.dispenserDepth+self.bracketDepth-15-47), self.candyWidth+self.bracketWidth/2, 5)
 
     def render(self):
       self.show_labels = False
@@ -135,12 +142,16 @@ class HorseArcade2(Boxes):
       self.bracketWidth=22
       self.bracketDepth=82
 
-      self.corner_dy = self.dispenserHeight
-      self.corner_dx = self.dispenserHeight
+      self.corner_dy = 0
+      self.corner_dx = 0
 
-      self.corner_length = math.sqrt(self.corner_dx*self.corner_dx+self.corner_dy*self.corner_dy)
-      self.corner_angle_radians = math.atan(self.corner_dy/self.corner_dx)
-
+      if 0:
+        self.corner_dy = self.dispenserHeight
+        self.corner_dx = self.dispenserHeight
+        self.corner_length = math.sqrt(self.corner_dx*self.corner_dx+self.corner_dy*self.corner_dy)
+        self.corner_angle_radians = math.atan(self.corner_dy/self.corner_dx)
+        
+        
       self.towerCandyCapacity = 30
       self.towerDepth = self.candyDepth + self.thickness * 2
       self.towerHeight = self.dispenserHeight + self.corner_dy + self.candyHeight * self.towerCandyCapacity
@@ -198,7 +209,7 @@ class HorseArcade2(Boxes):
       with self.ctx:
         self.label("Dispenser", self.dispenserWidth/2, 25, align="center")
         self.label("rear", self.dispenserWidth/2, 15, align="center")
-        self.rectangularWall(self.dispenserWidth, self.dispenserHeight, "eFFF")
+        self.rectangularWall(self.dispenserWidth, self.dispenserHeight, "eFeF")
         self.moveTo(0, self.dispenserHeight + self.thickness*2)
 
         self.label("Dispenser", self.dispenserWidth/2, 25, align="center")
@@ -207,9 +218,10 @@ class HorseArcade2(Boxes):
         self.moveTo(0, self.dispenserHeight + self.thickness*2)
 
         ## top
-        self.label("Dispenser", self.dispenserWidth/2, 25, align="center")
-        self.label("top", self.dispenserWidth/2, 15, align="center")
-        self.rectangularWall(self.dispenserWidth, self.dispenserDepth, "ffff")
+        if 0:
+          self.label("Dispenser", self.dispenserWidth/2, 25, align="center")
+          self.label("top", self.dispenserWidth/2, 15, align="center")
+          self.rectangularWall(self.dispenserWidth, self.dispenserDepth, "ffff")
 
       self.moveTo(self.dispenserWidth + self.thickness*6, 0)
 
