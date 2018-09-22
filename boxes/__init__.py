@@ -962,6 +962,7 @@ class Boxes:
         for i in range(n):
             self.ctx.arc(-r, 0, r, a, a+da)
             a += da
+        return (r*2, r*2)
 
     @restore
     @holeCol
@@ -980,6 +981,7 @@ class Boxes:
         for d in (dy, dx, dy, dx):
             self.corner(-90, r)
             self.edge(d - 2 * r)
+        return (dx, dy)
 
     @restore
     @holeCol
@@ -1032,6 +1034,8 @@ class Boxes:
 
         self.ctx.scale(1, -1)
         self.ctx.show_text(text)
+
+        return (width, height)
 
     tx_sizes = {
         1 : 0.61,
@@ -1482,6 +1486,8 @@ class Boxes:
         self.ctx.stroke()
 
         self.move(overallwidth, overallheight, move)
+
+        return (overallwidth, overallheight)
 
     def rectangularTriangle(self, x, y, edges="eee", r=0.0, num=1,
                         bedBolts=None, bedBoltSettings=None,

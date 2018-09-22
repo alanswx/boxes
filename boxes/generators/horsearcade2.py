@@ -19,8 +19,9 @@ class HorseArcade2(Boxes):
     def label(self, text, x=0, y=0, angle=0, align=""):
       if not self.show_labels: return
       self.ctx.set_source_rgb(*self.etchStrokeColor)
-      self.text(text, x, y, angle=angle, align=align)
+      size = self.text(text, x, y, angle=angle, align=align)
       self.ctx.set_source_rgb(*boxes.defaultStrokeColor)
+      return size
 
     def dispenserStand(self):
       with self.ctx:
@@ -91,34 +92,55 @@ class HorseArcade2(Boxes):
 
     def pusherTray(self):
       with self.ctx:
+        self.rectangularHole(self.thickness*1, (self.dispenserDepth + self.gearHeight/2) + self.thickness*2, self.gearDepth, 65)
+
+        ## connection to the servo side wall
+        self.fingerHolesAt(22,
+                           self.dispenserDepth + self.thickness - self.burn,
+                           self.bracketDepth - self.thickness, 90)
+
         self.edges['f'](self.candyWidth)
         self.corner(90)
         self.edges['f'](self.dispenserDepth)
-        #self.edges['e'](self.thickness*1)
-        self.corner(-90)
-        self.edges['e'](self.bracketWidth)
+
+        self.edges['f'](self.bracketDepth)
         self.corner(90)
-        self.edges['e'](self.bracketDepth)
-        self.corner(90)
-        self.edges['e'](self.bracketWidth+self.candyWidth)
+        self.edges['e'](self.candyWidth)
         self.corner(90)
         self.edges['f'](self.bracketDepth)
-        #self.edges['e'](self.thickness*1)
+
         self.edges['f'](self.dispenserDepth)
 
-        #self.hole(self.candyWidth/2+self.bracketWidth, self.bracketDepth+self.candyDepth/2, 2.5/2)
-        self.hole(-(self.dispenserDepth+self.bracketDepth-15), self.candyWidth+self.bracketWidth/2, 5)
-        self.hole(-(self.dispenserDepth+self.bracketDepth-15-47), self.candyWidth+self.bracketWidth/2, 5)
+        self.ctx.stroke()      
+
+    @restore
+    def draw_rect(self, width, height, sides='eeee'):
+      self.edges[sides[0]](width)
+      self.corner(90)
+      self.edges[sides[1]](height)
+      self.corner(90)
+      self.edges[sides[2]](width)
+      self.corner(90)
+      self.edges[sides[3]](height)
+      self.corner(90)
+      self.ctx.stroke()
 
     def render(self):
       self.show_labels = False
-      self.show_labels = True
+      #self.show_labels = True
 
-      self.thickness = 5.0
+      self.thickness = 5.00
       self.plasticThickness = 2.50
-      self.burn = .30
-      edges.FingerJointSettings.play = .300
+      self.burn = .20
+      edges.FingerJointSettings.play = .3
       self.reference = 0.0
+
+      #edges.HingeSettings.style = "outset"
+      #edges.HingeSettings.pinwidth = .9
+      #edges.HingeSettings.grip_percentage = .5
+      #edges.HingeSettings.grip_length = 5*2
+      #edges.HingeSettings.axle = .5
+      #edges.HingeSettings.hingestrength = 3
 
       self.etchStrokeColor = boxes.BLUE
       self.cutStrokeColor = boxes.RED
@@ -131,16 +153,26 @@ class HorseArcade2(Boxes):
       #self.ajoiningBoltDiameter = 5
       self.ajoiningBoltDiameter=6.75
 
-      self.candyWidth=58
+      self.gearDepth = 10
+      self.gearHeight = 68
+
+      self.servoWidth = 40.5
+      self.servoHeight = 20
+      self.servoDepth = 40
+      self.servoArm = 11
+
+      self.candyWidth=54
       self.candyDepth=96
       self.candyHeight=12
 
       self.dispenserWidth = self.candyWidth
       self.dispenserDepth = 200
-      self.dispenserHeight = 50
+      self.dispenserHeight = 70
+
+      self.pusherHeight = 12
 
       self.bracketWidth=22
-      self.bracketDepth=82
+      self.bracketDepth=self.candyDepth
 
       self.corner_dy = 0
       self.corner_dx = 0
@@ -163,7 +195,7 @@ class HorseArcade2(Boxes):
 
       self.consoleWidth = self.buttonDiameter*2 + self.buttonDiameter
       self.consoleDepth = self.dispenserDepth
-      self.consoleHeight = 50
+      self.consoleHeight = 70
 
 
 
@@ -178,7 +210,7 @@ class HorseArcade2(Boxes):
       self.dispenserStand()
       if 1:
         ## holes for the door bracket
-        self.fingerHolesAt(0,self.candyHeight+self.corner_dy+self.dispenserHeight + self.thickness,
+        self.fingerHolesAt(1, self.candyHeight+self.corner_dy+self.dispenserHeight + self.thickness + 3,
                            self.candyDepth + self.thickness*2, 0)
       if 1:
         ## ajoining holes
@@ -210,6 +242,10 @@ class HorseArcade2(Boxes):
         self.label("Dispenser", self.dispenserWidth/2, 25, align="center")
         self.label("rear", self.dispenserWidth/2, 15, align="center")
         self.rectangularWall(self.dispenserWidth, self.dispenserHeight, "eFeF")
+        ## connection to Servo side wall
+        self.fingerHolesAt(22 + 7,
+                           0,
+                           self.dispenserHeight, 90)
         self.moveTo(0, self.dispenserHeight + self.thickness*2)
 
         self.label("Dispenser", self.dispenserWidth/2, 25, align="center")
@@ -227,15 +263,61 @@ class HorseArcade2(Boxes):
 
       with self.ctx:
         self.label("Servo side wall", self.bracketDepth/2, 10, align="center")
+        w,h = self.rectangularWall(self.bracketDepth - self.thickness - self.burn, self.dispenserHeight,  "eeff")
 
-        self.rectangularWall(self.bracketDepth, self.thickness*2, "Feee")
-        self.moveTo(0, self.thickness*2 + self.thickness*4)
+        with self.ctx:
+          #self.moveTo(h/2 - self.servoHeight/2, h - self.servoWidth/2 - 15 - 1)
+          self.moveTo(self.servoWidth/2 + 32 - self.thickness, h - self.servoWidth/2 - 15 - 1)
+          self.moveTo(0,0,90)
+          #self.rectangularHole(0, 0, self.servoWidth, self.servoHeight)
+          with self.ctx:
+            self.moveTo(-self.servoWidth/2, -self.servoHeight/2)
+            self.draw_rect(self.servoWidth, self.servoHeight)
+          self.hole(-self.servoWidth/2-4, -self.servoHeight/2+2+3, 2)
+          self.hole(-self.servoWidth/2-4, -self.servoHeight/2+2+13, 2)
+          self.hole(self.servoWidth/2+4, -self.servoHeight/2+2+3, 2)
+          self.hole(self.servoWidth/2+4, -self.servoHeight/2+2+13, 2)
 
-        self.label("pusherTray", self.candyWidth/2, 25, align="center")
-        self.pusherTray()
+        self.moveTo(0, self.thickness*2 + self.bracketDepth + self.thickness*4)
+
+        if 0:
+          self.label("Servo side wall", self.bracketDepth/2, 10, align="center")
+          ret = self.rectangularWall(self.servoHeight + self.gearHeight/2, self.dispenserHeight,  "eefe")
+          with self.ctx:
+            self.moveTo(h/2 - self.servoHeight/2, h - self.servoWidth/2 - 15)
+            self.moveTo(0,0,90)
+            self.rectangularHole(0, 0, self.servoWidth, self.servoHeight)
+          self.moveTo(0, self.thickness*2 + self.bracketDepth + self.thickness*4)
+
+        self.label("Pusher top wall", self.bracketDepth/2, 10, align="center")
+        self.rectangularWall(self.candyWidth, self.bracketDepth, "efef")
+        self.moveTo(0, self.thickness*2 + self.bracketDepth + self.thickness*4)
+
+        self.label("Pusher side wall", self.bracketDepth/2, 10, align="center")
+        self.rectangularWall(self.bracketDepth, self.pusherHeight, "FeFe")
+        self.moveTo(0, self.thickness*2 + self.pusherHeight + self.thickness*4)
+
+        self.label("Pusher side wall", self.bracketDepth/2, 10, align="center")
+        self.rectangularWall(self.bracketDepth, self.pusherHeight, "FeFe")
+        self.moveTo(0, self.thickness*2 + self.pusherHeight + self.thickness*4)
+
+        if 1:
+          profile_shift = 0
+          pressure_angle = 30
+          modulus = 7.7
+          teeth2 = 25
+          mh = 5.6
+
+          self.gears(teeth=teeth2, dimension=modulus, angle=pressure_angle, spoke_count=0,
+                     mount_hole=mh, profile_shift=profile_shift, move=None)
+
+          self.moveTo(0, self.thickness*2 + self.gearHeight + self.thickness*4)
 
       self.moveTo(self.bracketDepth + self.thickness*4, 0)
+      self.label("pusherTray", self.candyWidth/2, 25, align="center")
+      self.pusherTray()
 
+      self.moveTo(self.bracketDepth + self.thickness*4, 0)
       # plastic
       self.label("Dispenser", self.candyWidth/2, 25, align="center")
       self.label("front plastic", self.candyWidth/2, 15, align="center")
@@ -250,30 +332,23 @@ class HorseArcade2(Boxes):
         self.label("Dispenser", self.candyWidth/2, 25, align="center")
         self.label("right side", self.candyWidth/2, 15, align="center")
         self.rectangularWall(self.candyWidth,
-                           self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight,
-                           "efef")
+                             self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight,
+                             "efef")
         self.moveTo(self.candyWidth + self.thickness*4, 0)
+
       if 1:
         self.label("Dispenser", self.candyWidth/2, 25, align="center")
         self.label("back door", self.candyWidth/2, 15, align="center")
         self.rectangularWall(self.candyWidth+self.thickness*5,
-                           self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight-self.thickness,
-                           "IEJe")
+                             self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight-self.thickness - self.burn,
+                             "IEJe")
         self.moveTo(self.candyWidth + self.thickness*8, 0)
-
-      if 0:
-        self.label("Dispenser", self.candyWidth/2, 25, align="center")
-        self.label("tube top", self.candyWidth/2, 15, align="center")
-        self.rectangularWall(self.candyWidth,
-                                   self.towerDepth,
-                                   "iFeF")
-        self.moveTo(self.candyWidth + self.thickness*4, 0)
 
       if 1:
         self.label("Dispenser", self.candyWidth/2, 25, align="center")
         self.label("tube top2", self.candyWidth/2, 15, align="center")
         with self.ctx:
-          self.edges['i'](self.candyWidth+self.thickness*2+self.thickness*2+self.thickness*2)
+          self.edges['i'](self.candyWidth+self.thickness*6)
           self.corner(90)
           self.edges['e'](self.thickness)
           self.edges['F'](self.towerDepth-self.thickness)
@@ -288,19 +363,10 @@ class HorseArcade2(Boxes):
         self.moveTo(self.candyWidth + self.thickness*6+10, 0)
 
       ## bottom hinge bracket
-      if 0:
-        self.label("Door", self.candyWidth/2, 25, align="center")
-        self.label("bottom bracket", self.candyWidth/2, 15, align="center")
-        self.rectangularWall(self.thickness*2,
-                                         self.towerDepth,
-                                         "ifee")
-        self.moveTo(self.candyWidth + self.thickness*4, 0)
-
       self.label("Door", self.candyWidth/2, 25, align="center")
       self.label("bottom bracket", self.candyWidth/2, 15, align="center")
       with self.ctx:
-          #self.edges['i'](self.thickness*2+self.thickness*2)
-          self.edges['i'](self.thickness*2+self.thickness*2)
+          self.edges['i'](self.thickness*4)
           self.corner(90)
           self.edges['e'](self.thickness)
           self.edges['f'](self.towerDepth-self.thickness)
@@ -312,6 +378,7 @@ class HorseArcade2(Boxes):
           self.edges['e'](self.thickness*3)
           self.corner(90)
           self.edges['e'](self.thickness*2)
+          self.ctx.stroke()      
       self.moveTo(self.candyWidth + self.thickness*4, 0)
 
       ## button console
@@ -392,57 +459,56 @@ class HorseArcade2(Boxes):
                     self.ajoiningBoltDiameter*2 + 2*self.thickness,
                     self.ajoiningBoltDiameter/2)
 
-        self.moveTo(0, self.consoleHeight + self.thickness*2)
+      self.moveTo(self.consoleWidth + self.thickness*4, 0)
+
+      #
+      #  raspberry pi box
+      #
+      with self.ctx:
+       self.piWidth = 150
+       self.piDepth = 125
+       self.piHeight = 75
+       self.label("Pi", self.piWidth/2, 25, align="center")
+       self.label("Front", self.piWidth/2, 15, align="center")
+       self.rectangularWall(self.piWidth, self.piHeight, "eFFF")
+       self.moveTo(0, self.piHeight + self.thickness*2)
+
+       self.label("Pi", self.piWidth/2, 25, align="center")
+       self.label("Rear", self.piWidth/2, 15, align="center")
+       self.rectangularWall(self.piWidth, self.piHeight, "eFFF")
+       # hole for the ethernet jack
+       jackoffset=-10
+       self.rectangularHole(self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
+       #self.rectangularHole(self.piWidth/4+jackoffset, self.piHeight/2, 25, 26)
+       self.rectangularHole(2*self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
+       #self.rectangularHole(2*self.piWidth/4+jackoffset, self.piHeight/2, 25, 26)
+       self.rectangularHole(3*self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
+       self.rectangularHole(4*self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
+       self.moveTo(0, self.piHeight + self.thickness*2)
+
+       ## top
+       with self.ctx:
+        self.label("Pi", self.piWidth/2, 25, align="center")
+        self.label("Top", self.piWidth/2, 15, align="center")
+
+        self.rectangularWall(self.piWidth, self.piDepth, "ffff")
+        self.moveTo(self.thickness, self.thickness)
+       self.moveTo(0, self.piDepth + self.thickness*4)
+
+       self.label("Pi", self.piDepth/2, 25, align="center")
+       self.label("Right Side", self.piDepth/2, 15, align="center")
+       self.rectangularWall(self.piDepth, self.piHeight, "efFf")
+       self.rectangularHole(self.piDepth/2+7.5, self.piHeight/2, 30, 20)
+
+       self.moveTo(0, self.piHeight + self.thickness*2)
+
+       self.label("Pi", self.piDepth/2, 25, align="center")
+       self.label("Left Side", self.piDepth/2, 15, align="center")
+       self.rectangularWall(self.piDepth, self.piHeight, "efFf")
+       self.rectangularHole(self.piDepth/2+7.5, self.piHeight/2, 30, 20)
 
 
-        #
-        #  raspberry pi box
-        #
-        with self.ctx:
-         self.piWidth = 150
-         self.piDepth = 125
-         self.piHeight = 75
-         self.label("Pi", self.piWidth/2, 25, align="center")
-         self.label("Front", self.piWidth/2, 15, align="center")
-         self.rectangularWall(self.piWidth, self.piHeight, "eFFF")
-         self.moveTo(0, self.piHeight + self.thickness*2)
-
-         self.label("Pi", self.piWidth/2, 25, align="center")
-         self.label("Rear", self.piWidth/2, 15, align="center")
-         self.rectangularWall(self.piWidth, self.piHeight, "eFFF")
-         # hole for the ethernet jack
-         jackoffset=-10
-         self.rectangularHole(self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
-         #self.rectangularHole(self.piWidth/4+jackoffset, self.piHeight/2, 25, 26)
-         self.rectangularHole(2*self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
-         #self.rectangularHole(2*self.piWidth/4+jackoffset, self.piHeight/2, 25, 26)
-         self.rectangularHole(3*self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
-         self.rectangularHole(4*self.piWidth/4+jackoffset, self.piHeight/2, 19, 26)
-         self.moveTo(0, self.piHeight + self.thickness*2)
-
-         ## top
-         with self.ctx:
-          self.label("Pi", self.piWidth/2, 25, align="center")
-          self.label("Top", self.piWidth/2, 15, align="center")
-
-          self.rectangularWall(self.piWidth, self.piDepth, "ffff")
-          self.moveTo(self.thickness, self.thickness)
-         self.moveTo(0, self.piDepth + self.thickness*4)
-
-         self.label("Pi", self.piDepth/2, 25, align="center")
-         self.label("Right Side", self.piDepth/2, 15, align="center")
-         self.rectangularWall(self.piDepth, self.piHeight, "efFf")
-         self.rectangularHole(self.piDepth/2+7.5, self.piHeight/2, 30, 20)
-
-         self.moveTo(0, self.piHeight + self.thickness*2)
-
-         self.label("Pi", self.piDepth/2, 25, align="center")
-         self.label("Left Side", self.piDepth/2, 15, align="center")
-         self.rectangularWall(self.piDepth, self.piHeight, "efFf")
-         self.rectangularHole(self.piDepth/2+7.5, self.piHeight/2, 30, 20)
-
-
-         self.moveTo(0, self.piHeight + self.thickness*2)
+       self.moveTo(0, self.piHeight + self.thickness*2)
 
 
 
