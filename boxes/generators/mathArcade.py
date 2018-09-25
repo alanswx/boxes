@@ -153,10 +153,11 @@ class MathArcade(Boxes):
       s = edges.FingerJointSettings(self.plasticThickness, relative=False, 
                                     space=10, finger=10,
                                     width=self.plasticThickness)
-      self.addPart(edges.FingerHoles(self, s), name="fingerHolesPlastic")
 
       ## button console
       with self.groupctx() as m:
+        self.addPart(edges.FingerHoles(self, s), name="fingerHolesPlastic")
+
         self.label("Console", self.consoleWidth/2, 25, align="center")
         self.label("Front", self.consoleWidth/2, 15, align="center")
         self.rectangularWall(self.consoleWidth, self.consoleHeight, "eFFF")

@@ -6,7 +6,7 @@ import os, sys, string, time, logging, argparse
 import re
 import logging
 
-import svgutil
+from . import svgutil
 
 _version = "0.1"
 
@@ -202,6 +202,7 @@ def mergeSVG(outfn, viewport_size, files, margin=2, outermargin=5, units="mm"):
       fn = outfn % pagenum
     except TypeError:
       fn = outfn
+
     logging.warn("writing page %d SVG %s" % (pagenum, fn))
     writeSVG(fn, _parts, viewport_size, margin, outermargin, units)
 
