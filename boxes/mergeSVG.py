@@ -59,8 +59,8 @@ def parseSVGs(files):
   return parts
 
 def layoutParts(parts, viewport_size, margin=2, outermargin=10):
-  #packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, rotation=True)
-  packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, rotation=False)
+  #packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, bin_algo=rectpack.PackingBin.Global, rotation=True)
+  packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, bin_algo=rectpack.PackingBin.Global, rotation=False)
 
   for n,part in enumerate(parts):
     rid = packer.add_rect(part['bbox'][0]+margin, part['bbox'][1]+margin, n)
@@ -157,14 +157,14 @@ def mergeSVG(outfn, viewport_size, files, margin=2, outermargin=5, units="mm"):
 
   if len(pages) > 1:
     _fn, _ext = os.path.splitext(outfn)
-    outfn = "%s\%d.%s" % (_fn, _ext)
+    outfn = "%s%%d%s" % (_fn, _ext)
 
   for pagenum,_parts in enumerate(pages):
     try:
       fn = outfn % pagenum
     except TypeError:
       fn = outfn
-    logging.debug("writing SVG %s" % fn)
+    logging.warn("writing page %d SVG %s" % (pagenum, fn))
     writeSVG(fn, _parts, viewport_size, outermargin, units)
 
 def start(args):

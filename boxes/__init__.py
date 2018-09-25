@@ -556,7 +556,7 @@ class Boxes:
 
       mergeSVG.mergeSVG(outfn, viewport_size, files)
 
-      if 0:
+      if 1:
         for fn in files:
           os.unlink(fn)
 
