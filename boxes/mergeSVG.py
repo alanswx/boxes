@@ -58,11 +58,12 @@ def parseSVGs(files):
   return parts
 
 def layoutParts(parts, viewport_size, margin=4, outermargin=10):
-  #packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, bin_algo=rectpack.PackingBin.Global, rotation=True)
-  packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, bin_algo=rectpack.PackingBin.Global, rotation=False)
+  packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, bin_algo=rectpack.PackingBin.Global, rotation=True)
+  #packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, bin_algo=rectpack.PackingBin.Global, rotation=False)
 
   for n,part in enumerate(parts):
-    rid = packer.add_rect(part.bbox[0]+margin, part.bbox[1]+margin, n)
+    part.bbox = (part.bbox[0]+margin, part.bbox[1]+margin)
+    rid = packer.add_rect(part.bbox[0], part.bbox[1], n)
 
   packer.add_bin(viewport_size[0]-outermargin*2, viewport_size[1]-outermargin*2, count=float("inf"))
 
@@ -85,8 +86,9 @@ def layoutParts(parts, viewport_size, margin=4, outermargin=10):
 
       dr = abs(rratio - pratio)
 
-      if dr > 0.1:
+      if dr > 0.01:
         part.rotated = True
+      #print (part.rotated, dr, rratio, pratio, rect, part.bbox)
   return pages
 
 def writeSVG(outfn, parts, viewport_size, margin=5, outermargin=10, units="mm"):
@@ -139,8 +141,8 @@ def writeSVG(outfn, parts, viewport_size, margin=5, outermargin=10, units="mm"):
     for el in part.tree.getroot():
       dest_root.append(el)
 
-      cx = viewBox[0]+part.x + margin + part.bbox[0]//2
-      cy = viewBox[1]+viewBox[3]-part.y - margin - part.bbox[1]//2
+      cx = viewBox[0]+part.x + part.bbox[0]//2
+      cy = viewBox[1]+viewBox[3]-part.y - part.bbox[1]//2
       #crosses.append(cross((cx, cy), 10))
 
       cx = viewBox[0]+part.x + margin
