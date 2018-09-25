@@ -22,7 +22,7 @@ except ImportError:
     pass
 import cairo
 import math
-import sys
+import os, sys
 import argparse
 from argparse import ArgumentParser
 import re
@@ -547,6 +547,19 @@ class Boxes:
                 out= sys.stdout
             svgutil.svgMerge(self.output, self.inkscapefile, out)
 
+    def groupClose(self, outfn, viewport_size):
+      from . import mergeSVG
+      files = []
+      for n in range(GroupCTX.groupnum):
+        fn = ".group_%s.svg" % n
+        files.append(fn)
+
+      mergeSVG.mergeSVG(outfn, viewport_size, files)
+
+      if 0:
+        for fn in files:
+          os.unlink(fn)
+
     ############################################################
     ### Turtle graphics commands
     ############################################################
@@ -875,138 +888,6 @@ class Boxes:
     def groupctx(self):
       return GroupCTX(self)
 
-    def groupClose(self, viewport_size):
-      import rtree
-
-      idx = rtree.index.Index()
-
-      defpat = re.compile("<defs>(.+)</defs>", re.DOTALL)
-      drawpat = re.compile("(<g id=.+)</svg>", re.DOTALL)
-
-      viewboxpat = re.compile('viewBox="(\d+) (\d+) (\d+) (\d+)"')
-      dimpat = re.compile('width="(\d+)mm" height="(\d+)mm"')
-
-      fp = open("box.svg", "w")
-      fp.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-
-      parts = []
-
-      dimx = 0
-      dimy = 0
-      vp_max_width = 0
-      vp_max_height = 0
-
-      for n in range(GroupCTX.groupnum):
-        part = {}
-        parts.append(part)
-
-        fn = ".group_%s.svg" % n
-        body = open(fn, "r").read()
-
-        m = viewboxpat.search(body)
-        if m:
-          part['vp_minx'] = int(m.group(1))
-          part['vp_miny'] = int(m.group(2))
-          part['vp_width'] = int(m.group(3))
-          part['vp_height'] = int(m.group(4))
-
-          vp_max_width = max(vp_max_width, part['vp_width'])
-          vp_max_height = max(vp_max_height, part['vp_height'])
-
-        m = dimpat.search(body)
-        if m:
-          part['width'] = int(m.group(1))
-          part['height'] = int(m.group(2))
-
-          dimx += part['width']
-          dimy = max(dimy, part['height'])
-          
-        m = defpat.search(body)
-        if m:
-          defs = m.group(1)
-          defs = defs.replace("glyph", "glyph%d_" % n)
-          part['defs'] = defs
-        else:
-          print ("no def in %s" % fn)
-
-        m = drawpat.search(body)
-        if m:
-          draw = m.group(1)
-          part['draw'] = draw.replace("glyph", "glyph%d_" % n)
-
-
-      margin = 10
-
-      starty = margin
-      x = 0
-      y = starty
-      width, height = viewport_size
-
-      prev_part = None
-
-      for n,part in enumerate(parts):
-        #print (n, part['vp_width'], part['vp_height'])
-        while 1:
-          bbox = (x,y,x+part['vp_width'], y+part['vp_height'])
-          ids = list(idx.intersection(bbox))
-          #print ("while", n, x,y, ids)
-          if not ids:
-            part['x'] = x
-            part['y'] = y
-            #print (n,x,y,part['vp_width'], part['vp_height'])
-            break
-
-          if prev_part:
-            y += prev_part['vp_height'] + margin
-            if y+part['vp_height'] > starty + height: 
-              y = starty
-              x += prev_part['vp_width'] + margin
-
-              
-        if 0:
-          ## optimize placement
-          x = bbox[0]
-          while 1:
-            if x < margin: break
-            bbox2 = (x,bbox[1],x+part['vp_width'], bbox[3])
-            ids = list(idx.intersection(bbox2))
-            if ids:
-              break
-            bbox = bbox2
-            x -= 2
-          
-        idx.insert(n, bbox)
-
-        prev_part = part
-      
-      minx = 12000
-      miny = 12000
-      for n,part in enumerate(parts):
-        minx = min(minx, part['x'])
-        miny = min(miny, part['y'])
-
-      print (minx, miny)
-
-      miny = 9400
-
-##      fp.write('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="130mm" height="130mm" viewBox="0 9880 110 130"      version="1.1">')
-      fp.write('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="%dmm" height="%dmm" viewBox="%d %d %d %d"      version="1.1">\n' % (viewport_size[0], viewport_size[1], minx - margin, miny, viewport_size[0], viewport_size[1]))
-
-      fp.write("<defs>\n")
-      for part in parts:
-        if 'defs' in part:
-          fp.write(part['defs'])
-      fp.write("</defs>\n")
-
-      for n,part in enumerate(parts):
-        if 'draw' in part:
-          fp.write('<g transform="translate(%d %d)">' % (part['x'], -part['y']))
-          fp.write(part['draw'])
-          fp.write('</g>')
-
-      fp.write("</svg>\n")
-        
-      fp.close()
 
     def move(self, x, y, where, before=False):
         """Intended to be used by parts

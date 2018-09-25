@@ -491,4 +491,4 @@ class HorseArcade2(Boxes):
         self.rectangularWall(self.piDepth, self.piHeight, "efFf")
         self.rectangularHole(self.piDepth/2+7.5, self.piHeight/2, 30, 20)
 
-      self.groupClose((1220, 609))
+      self.groupClose("box.svg", (1220, 609))
