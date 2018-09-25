@@ -118,8 +118,6 @@ class MathArcade(Boxes):
       boxes.defaultStrokeColor = self.cutStrokeColor
       boxes.holeStrokeColor = self.cutStrokeColor
 
-      self.open()
-
       self.ajoiningBoltDiameter = 5
 
       self.candyWidth=58
@@ -158,36 +156,34 @@ class MathArcade(Boxes):
       self.addPart(edges.FingerHoles(self, s), name="fingerHolesPlastic")
 
       ## button console
-      with self.ctx:
+      with self.groupctx() as m:
         self.label("Console", self.consoleWidth/2, 25, align="center")
         self.label("Front", self.consoleWidth/2, 15, align="center")
         self.rectangularWall(self.consoleWidth, self.consoleHeight, "eFFF")
-        self.moveTo(0, self.consoleHeight + self.thickness*2)
 
+      with self.groupctx() as m:
         self.label("Console", self.consoleWidth/2, 25, align="center")
         self.label("Rear", self.consoleWidth/2, 15, align="center")
         self.rectangularWall(self.consoleWidth, self.consoleHeight, "eFFF")
-        self.moveTo(0, self.consoleHeight + self.thickness*2)
 
-        ## top
-        with self.ctx:
-          self.label("Console", self.consoleWidth/2, 25, align="center")
-          self.label("Top", self.consoleWidth/2, 15, align="center")
+      ## top
+      with self.groupctx() as m:
+        self.label("Console", self.consoleWidth/2, 25, align="center")
+        self.label("Top", self.consoleWidth/2, 15, align="center")
 
-          self.rectangularWall(self.consoleWidth, self.consoleDepth, "ffff")
-          self.moveTo(self.thickness, self.thickness)
-          # button 1
-          self.hole(self.consoleWidth/3, self.consoleDepth/3, self.buttonHoleDiameter/2)  
-          # button 2
-          self.hole(2*(self.consoleWidth/3), self.consoleDepth/3, self.buttonHoleDiameter/2)
+        self.rectangularWall(self.consoleWidth, self.consoleDepth, "ffff")
+        self.moveTo(self.thickness, self.thickness)
+        # button 1
+        self.hole(self.consoleWidth/3, self.consoleDepth/3, self.buttonHoleDiameter/2)  
+        # button 2
+        self.hole(2*(self.consoleWidth/3), self.consoleDepth/3, self.buttonHoleDiameter/2)
 
-          # button 3
-          self.hole(self.consoleWidth/3, 2*self.consoleDepth/3, self.buttonHoleDiameter/2)  
-          # button 4
-          self.hole(2*(self.consoleWidth/3), 2*self.consoleDepth/3, self.buttonHoleDiameter/2)
+        # button 3
+        self.hole(self.consoleWidth/3, 2*self.consoleDepth/3, self.buttonHoleDiameter/2)  
+        # button 4
+        self.hole(2*(self.consoleWidth/3), 2*self.consoleDepth/3, self.buttonHoleDiameter/2)
 
-        self.moveTo(0, self.consoleDepth + self.thickness*4)
-
+      with self.groupctx() as m:
         self.label("Console", self.consoleDepth/2, 25, align="center")
         self.label("Right Side", self.consoleDepth/2, 15, align="center")
         self.rectangularWall(self.consoleDepth, self.consoleHeight, "efFf")
@@ -202,8 +198,7 @@ class MathArcade(Boxes):
                     self.ajoiningBoltDiameter*2 + 2*self.thickness,
                     self.ajoiningBoltDiameter/2)
 
-        self.moveTo(0, self.consoleHeight + self.thickness*2)
-
+      with self.groupctx() as m:
         self.label("Console", self.consoleDepth/2, 25, align="center")
         self.label("Left Side", self.consoleDepth/2, 15, align="center")
         self.rectangularWall(self.consoleDepth, self.consoleHeight, "efFf")
@@ -218,6 +213,5 @@ class MathArcade(Boxes):
                     self.ajoiningBoltDiameter*2 + 2*self.thickness,
                     self.ajoiningBoltDiameter/2)
 
-        self.moveTo(0, self.consoleHeight + self.thickness*2)
 
-      self.close()
+      self.groupClose("box.svg", (1220, 609))
