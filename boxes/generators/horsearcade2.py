@@ -411,12 +411,13 @@ class HorseArcade2(Boxes):
         self.hole(3*self.consoleWidth/4-self.buttonHoleDiameter/2-self.tinyholedistance, self.consoleDepth/2, self.tinybuttonhole/2)
         self.hole(3*self.consoleWidth/4+self.buttonHoleDiameter/2+self.tinyholedistance, self.consoleDepth/2, self.tinybuttonhole/2)
 
-        t = boxes.holeStrokeColor
-        boxes.holeStrokeColor = self.etchStrokeColor
-        self.hole(self.consoleWidth/4, self.consoleDepth/2, self.buttonDiameter/2)
-        self.hole(3*(self.consoleWidth/4), self.consoleDepth/2, self.buttonDiameter/2)
+        if 0:
+          t = boxes.holeStrokeColor
+          boxes.holeStrokeColor = self.etchStrokeColor
+          self.hole(self.consoleWidth/4, self.consoleDepth/2, self.buttonDiameter/2)
+          self.hole(3*(self.consoleWidth/4), self.consoleDepth/2, self.buttonDiameter/2)
 
-        boxes.holeStrokeColor = t
+          boxes.holeStrokeColor = t
 
       with self.groupctx() as m:
         self.label("Console", self.consoleDepth/2, 25, align="center")

@@ -15,11 +15,11 @@ import rectpack
 from lxml import etree as et
 from lxml import builder
 
-if 0:
+if 1:
   #from scipy.spatial import ConvexHull
   import scipy.spatial
   import numpy as np
-  from shapely.geometry import Point, MultiPoint, Polygon
+  from shapely.geometry import Point, MultiPoint, Polygon, MultiPolygon
 
 svg_ns = 'http://www.w3.org/2000/svg'
 
@@ -83,6 +83,8 @@ def concave_hull(points, alpha, delunay_args=None):
         poly = poly.union(Polygon(list(zip(X[i], Y[i]))))
     return poly     
 
+
+
 def convex_hull(points):
   hull = scipy.spatial.ConvexHull(points)
   hpoints = []
@@ -120,12 +122,18 @@ def parseSVGs(files):
     part.tree = src_tree
 
     paths, attributes = svgpathtools.svg2paths(fn)
+
     points = []
-    for n, path in enumerate(paths):
-      #print (fn, attributes[n]['transform'])
-      for _part in path:
-        for pt in _part:
-          points.append((pt.real, pt.imag))
+
+    path = svgpathtools.concatpaths(paths)
+
+    for _part in path:
+      for pt in _part:
+        points.append((pt.real, pt.imag))
+
+    poly = Polygon(points)
+    part.hull = list(poly.exterior.coords)
+          
 
     if 0:
       fp = open(fn + ".wkt", "w")
@@ -140,10 +148,25 @@ def parseSVGs(files):
         fp.write("))\n")
       fp.close()
 
-      part.hull = convex_hull(points)
-      #hull = concave_hull(points, alpha=0.05)
-      #part.hull = list(hull.exterior.coords)
+    if 0:
+      #part.hull = convex_hull(points)
+      hull = concave_hull(points, alpha=0.15)
+      part.hull = list(hull.exterior.coords)
 
+    if 1:
+      p = Polygon(points)
+      p2 = p.simplify(2, preserve_topology=True)
+
+      if p2.__class__ == MultiPolygon:
+        for poly in p2:
+          part.hull = list(poly.exterior.coords)
+      else:
+        part.hull = list(p2.exterior.coords)
+
+      hull = concave_hull(part.hull, alpha=.01)
+      part.hull = list(hull.exterior.coords)
+
+      
 
     if 1:
       xlist = [x for (x,y) in points]
@@ -156,7 +179,7 @@ def parseSVGs(files):
       part.bounding = (xmin, ymin, xmax, ymax)
       part.bsize = ((part.bounding[2]-part.bounding[0]), (part.bounding[3] - part.bounding[1]))
 
-    #print (fn, n, len(points), part.bounding, part.size, part.bsize)
+    print (fn, n, len(points), part.bounding, part.size, part.bsize)
     logging.debug(prefix + ": size:%s viewbox:%s scale:%s" % (part.size, part.viewbox, part.scale))
 
   return parts
@@ -256,7 +279,7 @@ def writeSVG(outfn, parts, viewport_size, margin=0, outermargin=0, units="mm"):
 
     if 0:
       bounding_boxes.append(rect(x1,y1,x2,y2))
-    #bounding_boxes.append(polyline(x1,y1,part.hull))
+    bounding_boxes.append(polyline(x1,y1,part.hull))
     
     for el in part.tree.getroot():
       dest_root.append(el)
@@ -343,7 +366,7 @@ def polyline(x1,y1,points):
 
   return group
 
-def polyline(x1,y1,lines):
+def polyline2(x1,y1,lines):
   E = builder.ElementMaker(namespace=svg_ns)
   group = E.g()
   for pt1,pt2 in lines:
