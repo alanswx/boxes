@@ -15,6 +15,12 @@ import rectpack
 from lxml import etree as et
 from lxml import builder
 
+if 0:
+  #from scipy.spatial import ConvexHull
+  import scipy.spatial
+  import numpy as np
+  from shapely.geometry import Point, MultiPoint, Polygon
+
 svg_ns = 'http://www.w3.org/2000/svg'
 
 class Part:
@@ -26,6 +32,66 @@ class Part:
     self.rotated = False
 
     self.tree = None
+
+def circumcircle(points, simplex):
+    """Computes the circumcentre and circumradius of a triangle:
+    https://en.wikipedia.org/wiki/Circumscribed_circle#Circumcircle_equations
+    """
+    A = [points[simplex[k]] for k in range(3)]
+    M = np.asarray(
+        [[1.0] * 4] +
+        [[sq_norm(A[k]), A[k][0], A[k][1], 1.0] for k in range(3)],
+        dtype=np.float32)
+    S = np.array([
+      0.5 * np.linalg.det(M[1:, [0, 2, 3]]),
+      -0.5 * np.linalg.det(M[1:, [0, 1, 3]])
+    ])
+    a = np.linalg.det(M[1:, 1:])
+    b = np.linalg.det(M[1:, [0, 1, 2]])
+    centre, radius = S / a, np.sqrt(b / a + sq_norm(S) / a**2)
+    return centre, radius
+
+
+def get_alpha_complex(alpha, points, simplexes):
+    """Obtain the alpha shape.
+    Args:
+        alpha (float): the paramter for the alpha shape
+        points: data points
+        simplexes: the list of indices that define 2-simplexes in the Delaunay
+            triangulation
+    """
+    return filter(lambda simplex: circumcircle(points, simplex)[1] < alpha,
+                  simplexes)
+
+
+def concave_hull(points, alpha, delunay_args=None):
+    """Computes the concave hull (alpha-shape) of a set of points.
+    """
+    delunay_args = delunay_args or {
+      'furthest_site': False,
+      'incremental': False,
+      'qhull_options': None
+    }
+    triangulation = scipy.spatial.Delaunay(np.array(points))
+    alpha_complex = get_alpha_complex(alpha, points, triangulation.simplices)
+    X, Y = [], []
+    for s in triangulation.simplices:
+        X.append([points[s[k]][0] for k in [0, 1, 2, 0]])
+        Y.append([points[s[k]][1] for k in [0, 1, 2, 0]])
+    poly = Polygon(list(zip(X[0], Y[0])))
+    for i in range(1, len(X)):
+        poly = poly.union(Polygon(list(zip(X[i], Y[i]))))
+    return poly     
+
+def convex_hull(points):
+  hull = scipy.spatial.ConvexHull(points)
+  hpoints = []
+##  for idx in hull.vertices:
+##    hpoints.append(points[idx])
+
+  for idx in hull.simplices:
+    hpoints.append((points[idx[0]],points[idx[1]]))
+  return hpoints
 
 def parseSVGs(files):
   defpat = re.compile("<defs>(.+)</defs>", re.DOTALL)
@@ -53,16 +119,59 @@ def parseSVGs(files):
 
     part.tree = src_tree
 
+    paths, attributes = svgpathtools.svg2paths(fn)
+    points = []
+    for n, path in enumerate(paths):
+      #print (fn, attributes[n]['transform'])
+      for _part in path:
+        for pt in _part:
+          points.append((pt.real, pt.imag))
+
+    if 0:
+      fp = open(fn + ".wkt", "w")
+
+      for n, path in enumerate(paths):
+        fp.write("POLYGON ((")
+        pieces = []
+        for _part in path:
+          for m,pt in enumerate(_part):
+            pieces.append("%.1f %.1f" % (pt.real, pt.imag))
+        fp.write("%s" % ', '.join(pieces))
+        fp.write("))\n")
+      fp.close()
+
+      part.hull = convex_hull(points)
+      #hull = concave_hull(points, alpha=0.05)
+      #part.hull = list(hull.exterior.coords)
+
+
+    if 1:
+      xlist = [x for (x,y) in points]
+      ylist = [y for (x,y) in points]
+      xmin = min(xlist)
+      xmax = max(xlist)
+      ymin = min(ylist)
+      ymax = max(ylist)
+
+      part.bounding = (xmin, ymin, xmax, ymax)
+      part.bsize = ((part.bounding[2]-part.bounding[0]), (part.bounding[3] - part.bounding[1]))
+
+    #print (fn, n, len(points), part.bounding, part.size, part.bsize)
     logging.debug(prefix + ": size:%s viewbox:%s scale:%s" % (part.size, part.viewbox, part.scale))
 
   return parts
 
-def layoutParts(parts, viewport_size, margin=4, outermargin=10):
-  packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, bin_algo=rectpack.PackingBin.Global, rotation=True)
+import svgpathtools
+
+def layoutParts(parts, viewport_size, margin=0, outermargin=0):
+  #packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, bin_algo=rectpack.PackingBin.Global, rotation=True)
+  packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, rotation=True)
   #packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, bin_algo=rectpack.PackingBin.Global, rotation=False)
+  #packer = rectpack.newPacker(mode=rectpack.PackingMode.Offline, rotation=False)
 
   for n,part in enumerate(parts):
     part.bbox = (part.bbox[0]+margin, part.bbox[1]+margin)
+    #part.bbox = (part.bsize[0]+margin, part.bsize[1]+margin)
     rid = packer.add_rect(part.bbox[0], part.bbox[1], n)
 
   packer.add_bin(viewport_size[0]-outermargin*2, viewport_size[1]-outermargin*2, count=float("inf"))
@@ -88,10 +197,10 @@ def layoutParts(parts, viewport_size, margin=4, outermargin=10):
 
       if dr > 0.01:
         part.rotated = True
-      #print (part.rotated, dr, rratio, pratio, rect, part.bbox)
+      #print ("%s %d %.2f %.2f %.2f %s %s" % (part.rotated, rect.rid, dr, rratio, pratio, rect, part.bbox))
   return pages
 
-def writeSVG(outfn, parts, viewport_size, margin=5, outermargin=10, units="mm"):
+def writeSVG(outfn, parts, viewport_size, margin=0, outermargin=0, units="mm"):
   minx = 12000
   miny = 12000
   vp_max_width = 0
@@ -137,7 +246,18 @@ def writeSVG(outfn, parts, viewport_size, margin=5, outermargin=10, units="mm"):
 
   xlink = '{http://www.w3.org/1999/xlink}href'
   crosses = []
+  bounding_boxes = []
+
   for n, part in enumerate(parts):
+    x1 = viewBox[0]+part.x 
+    y1 = viewBox[1]+viewBox[3]-part.y
+    x2 = x1 + part.bsize[0]
+    y2 = y1 - part.bsize[1]
+
+    if 0:
+      bounding_boxes.append(rect(x1,y1,x2,y2))
+    #bounding_boxes.append(polyline(x1,y1,part.hull))
+    
     for el in part.tree.getroot():
       dest_root.append(el)
 
@@ -149,14 +269,17 @@ def writeSVG(outfn, parts, viewport_size, margin=5, outermargin=10, units="mm"):
       cy = viewBox[1]+viewBox[3]-part.y - margin 
       crosses.append(cross((cx, cy), 10))
 
+
       if el.tag.endswith("g"):
         if part.rotated:
           rotation = 90
           el.set("transform", 'rotate(%d %d %d) translate(%d %d)' % (rotation, 
                                                                      cx, cy,
-                                                                     part.x - part.bbox[0], -part.y))
+                                                                     part.x - part.bbox[0], 
+                                                                     -part.y))
         else:
-          el.set("transform", 'translate(%d %d)' % (part.x, -part.y))
+          el.set("transform", 'translate(%d %d)' % (part.x - outermargin*2 - margin*2,
+                                                    -(part.y - outermargin*2 - margin*2)))
       elif el.tag.endswith("defs"):
         for child in el.iterfind(".//{%s}symbol" % svg_ns):
           child.attrib['id'] = child.attrib['id'].replace("glyph", "glyph%d_" % n)
@@ -168,6 +291,10 @@ def writeSVG(outfn, parts, viewport_size, margin=5, outermargin=10, units="mm"):
     E = builder.ElementMaker(namespace=svg_ns)
     group = E.g(transform="translate(%d %d)" % (outermargin, outermargin))
     dest_root.insert(0, group)
+
+  if 1:
+    for _box in bounding_boxes:
+      dest_root.append(_box)
 
   if 0:
     for _cross in crosses:
@@ -188,9 +315,45 @@ def cross(pos, size=50):
   group.append(E.line(x1=str(pos[0]-size), y1=str(pos[1]), x2=str(pos[0]+size), y2=str(pos[1]), style="stroke:rgb(255,0,0);stroke-width:2"))
   group.append(E.line(x1=str(pos[0]), y1=str(pos[1]-size), x2=str(pos[0]), y2=str(pos[1]+size), style="stroke:rgb(255,0,0);stroke-width:2"))
   return group
+
+def rect(x1,y1,x2,y2):
+  x1 = int(x1)
+  y1 = int(y1)
+  x2 = int(x2)
+  y2 = int(y2)
+  E = builder.ElementMaker(namespace=svg_ns)
+  group = E.g()
+  group.append(E.line(x1=str(x1), y1=str(y1), x2=str(x2), y2=str(y1), style="stroke:rgb(0,0,255);stroke-width:1"))
+  group.append(E.line(x1=str(x2), y1=str(y1), x2=str(x2), y2=str(y2), style="stroke:rgb(0,0,255);stroke-width:1"))
+  group.append(E.line(x1=str(x2), y1=str(y2), x2=str(x1), y2=str(y2), style="stroke:rgb(0,0,255);stroke-width:1"))
+  group.append(E.line(x1=str(x1), y1=str(y2), x2=str(x1), y2=str(y1), style="stroke:rgb(0,0,255);stroke-width:1"))
+  return group
+
+def polyline(x1,y1,points):
+  E = builder.ElementMaker(namespace=svg_ns)
+  group = E.g()
+  lastpt = None
+  for pt in points:
+    if lastpt is None:
+      lastpt = pt
+      continue
+    group.append(E.line(x1=str(x1+lastpt[0]), y1=str(y1-lastpt[1]), x2=str(x1+pt[0]), y2=str(y1-pt[1]), style="stroke:rgb(0,0,255);stroke-width:1"))
+    lastpt = pt
+  group.append(E.line(x1=str(x1+lastpt[0]), y1=str(y1-lastpt[1]), x2=str(x1+points[0][0]), y2=str(y1-points[0][1]), style="stroke:rgb(0,0,255);stroke-width:1"))
+
+  return group
+
+def polyline(x1,y1,lines):
+  E = builder.ElementMaker(namespace=svg_ns)
+  group = E.g()
+  for pt1,pt2 in lines:
+    group.append(E.line(x1=str(x1+pt1[0]), y1=str(y1-pt1[1]), x2=str(x1+pt2[0]), y2=str(y1-pt2[1]), style="stroke:rgb(0,0,255);stroke-width:1"))
+
+  return group
   
 
-def mergeSVG(outfn, viewport_size, files, margin=2, outermargin=5, units="mm"):
+#def mergeSVG(outfn, viewport_size, files, margin=2, outermargin=5, units="mm"):
+def mergeSVG(outfn, viewport_size, files, margin=0, outermargin=0, units="mm"):
   parts = parseSVGs(files)
 
   pages = layoutParts(parts, viewport_size, margin)
