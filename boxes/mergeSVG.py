@@ -127,12 +127,13 @@ def parseSVGs(files):
 
     path = svgpathtools.concatpaths(paths)
 
-    for _part in path:
-      for pt in _part:
-        points.append((pt.real, pt.imag))
+    if 1:
+      for _part in path:
+        for pt in _part:
+          points.append((pt.real, pt.imag))
 
-    poly = Polygon(points)
-    part.hull = list(poly.exterior.coords)
+      poly = Polygon(points)
+      part.hull = list(poly.exterior.coords)
           
 
     if 0:
@@ -153,7 +154,7 @@ def parseSVGs(files):
       hull = concave_hull(points, alpha=0.15)
       part.hull = list(hull.exterior.coords)
 
-    if 1:
+    if 0:
       p = Polygon(points)
       p2 = p.simplify(2, preserve_topology=True)
 
@@ -279,7 +280,7 @@ def writeSVG(outfn, parts, viewport_size, margin=0, outermargin=0, units="mm"):
 
     if 0:
       bounding_boxes.append(rect(x1,y1,x2,y2))
-    bounding_boxes.append(polyline(x1,y1,part.hull))
+      bounding_boxes.append(polyline(x1,y1,part.hull))
     
     for el in part.tree.getroot():
       dest_root.append(el)
