@@ -180,7 +180,7 @@ def parseSVGs(files):
       part.bounding = (xmin, ymin, xmax, ymax)
       part.bsize = ((part.bounding[2]-part.bounding[0]), (part.bounding[3] - part.bounding[1]))
 
-    print (fn, n, len(points), part.bounding, part.size, part.bsize)
+    #print (fn, n, len(points), part.bounding, part.size, part.bsize)
     logging.debug(prefix + ": size:%s viewbox:%s scale:%s" % (part.size, part.viewbox, part.scale))
 
   return parts

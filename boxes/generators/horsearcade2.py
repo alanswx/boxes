@@ -182,7 +182,7 @@ class HorseArcade2(Boxes):
         self.corner_angle_radians = math.atan(self.corner_dy/self.corner_dx)
         
         
-      self.towerCandyCapacity = 49
+      self.towerCandyCapacity = 30
       self.towerDepth = self.candyDepth + self.thickness * 2
       self.towerHeight = self.dispenserHeight + self.corner_dy + self.candyHeight * self.towerCandyCapacity
 
@@ -195,8 +195,6 @@ class HorseArcade2(Boxes):
       self.consoleDepth = self.dispenserDepth
       self.consoleHeight = 70
 
-      self.magnetDiameter = (6.4)
-      self.magnetDepth = (6.4)
 
       self.dispenser()
       #self.console()
@@ -248,11 +246,6 @@ class HorseArcade2(Boxes):
                     self.ajoiningBoltDiameter*2 + 2*self.thickness,
                     self.ajoiningBoltDiameter/2)
           
-          ## magnet holder
-          self.rectangularHole(self.magnetDepth/2 + 1, 
-                               self.candyHeight+self.corner_dy+self.dispenserHeight + self.thickness + 3 + self.thickness*4 - self.thickness + 1, self.magnetDepth, self.magnetDiameter)
-
-          self.rectangularHole(self.magnetDepth/2 + 1, self.towerHeight - self.thickness*4 - 1, self.magnetDepth, self.magnetDiameter)
 
       with self.groupctx() as m:
         self.label("Dispenser", self.dispenserWidth/2, 25, align="center")
@@ -334,9 +327,23 @@ class HorseArcade2(Boxes):
         self.label("Dispenser", self.candyWidth/2, 25, align="center")
         self.label("front plastic", self.candyWidth/2, 15, align="center")
 
-        self.rectangularWall(self.candyWidth,
-                             self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight,
-                             "efef")
+        if 0:
+          self.rectangularWall(self.candyWidth,
+                               self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight*1.5,
+                               "efef")
+
+        self.edges['e'](self.candyWidth)
+        self.corner(90)
+        self.edges['f'](self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight*1.8)
+        self.edges['e'](self.candyHeight - self.thickness/2)
+        self.corner(90)
+        self.edges['e'](self.candyWidth)
+        self.corner(90)
+        self.edges['e'](self.candyHeight - self.thickness/2)
+        self.edges['f'](self.towerHeight-self.corner_dy-self.dispenserHeight-self.candyHeight*1.8)
+        self.corner(90)
+        self.ctx.stroke()
+        
 
       if 0:
         with self.groupctx() as m:
@@ -356,9 +363,6 @@ class HorseArcade2(Boxes):
         ## candy window
         self.rectangularHole(w/2, h/2, self.thickness*2, h-self.thickness*20, r=5)
 
-        ## magnet hole
-        self.hole(w-self.thickness/4, self.thickness*4, self.magnetDiameter/2)
-        self.hole(w-self.thickness/4, h - self.thickness*6, self.magnetDiameter/2)
 
       with self.groupctx() as m:
         self.label("Dispenser", self.candyWidth/2, 25, align="center")
